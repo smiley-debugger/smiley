@@ -1,4 +1,0 @@
-smiley
-======
-
-Python Application Tracer
