@@ -1,4 +1,3 @@
-import json
 import linecache
 import logging
 
@@ -21,6 +20,12 @@ class Monitor(command.Command):
             default='tcp://127.0.0.1:5556',
             help='URL for the socket where to monitor on (%(default)s)',
         )
+        parser.add_argument(
+            '--exit',
+            default=False,
+            action='store_true',
+            help='Exit monitor when sender exits',
+        )
         return parser
 
     def _process_message(self, msg):
@@ -30,6 +35,8 @@ class Monitor(command.Command):
             print 'Starting new run:', msg_payload.get('command_line')
         elif msg_type == 'end_run':
             print 'Finished run'
+            if self._parsed_args.exit:
+                raise SystemExit()
         else:
             #print msg_type, msg_payload
             line = linecache.getline(
@@ -58,6 +65,7 @@ class Monitor(command.Command):
             print
 
     def take_action(self, parsed_args):
+        self._parsed_args = parsed_args
         l = listener.Listener(parsed_args.socket)
         l.poll_forever(self._process_message)
         return
