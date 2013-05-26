@@ -24,6 +24,13 @@ help
 
   Get help for the ``smiley`` command or a subcommand.
 
+Installing
+==========
+
+Install with ``pip``::
+
+  $ pip install smiley
+
 Using
 =====
 
