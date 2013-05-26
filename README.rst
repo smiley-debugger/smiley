@@ -27,8 +27,8 @@ The Name
 References
 ==========
 
-Inspired in part by
+Inspired by and based on
 
-* coverage.py
-* qdb
-* 
+* `coverage.py <https://pypi.python.org/pypi/coverage>`__
+* `qdb <https://code.google.com/p/rad2py/wiki/QdbRemotePythonDebugger>`__
+
