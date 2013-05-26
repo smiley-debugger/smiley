@@ -99,7 +99,8 @@ class Tracer(object):
                      'cwd': os.getcwd(),
                      'command_line': command_line},
                 )
-                execfile(command_line[0])
+                execfile(command_line[0],
+                         {'__name__': '__main__'})
         finally:
             self.publisher.send(
                 'end_run',
