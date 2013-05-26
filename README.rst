@@ -27,8 +27,8 @@ The Name
 References
 ==========
 
-Inspired by and based on
+Inspired by and partially based on
 
 * `coverage.py <https://pypi.python.org/pypi/coverage>`__
 * `qdb <https://code.google.com/p/rad2py/wiki/QdbRemotePythonDebugger>`__
-
+* `StackTach <https://github.com/rackerlabs/stacktach>`__
