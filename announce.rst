@@ -7,6 +7,8 @@
 What is smiley?
 ===============
 
+*Smiley spies on your Python app while it runs.*
+
 Smiley_ includes several subcommands for running Python programs and
 monitoring all of the internal details for recording and
 reporting. For more details, see the `README on PyPI
