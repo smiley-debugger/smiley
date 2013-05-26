@@ -2,6 +2,8 @@ import logging
 
 from cliff import command
 
+from smiley import publisher, tracer
+
 
 class Run(command.Command):
     """Run another program with monitoring enabled.
@@ -24,4 +26,7 @@ class Run(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        p = publisher.Publisher(parsed_args.socket)
+        t = tracer.Tracer(p)
+        t.run(parsed_args.command)
         return
