@@ -1,5 +1,6 @@
 import atexit
 import inspect
+import logging
 import os
 import random
 import socket
@@ -9,6 +10,7 @@ import uuid
 
 import smiley
 
+LOG = logging.getLogger(__name__)
 
 # Based on similar logic from coverage's control.py, by Ned
 # Batchelder, et al.
@@ -53,9 +55,9 @@ class Tracer(object):
         filename = os.path.abspath(co.co_filename)
         for d in IGNORE_DIRS:
             if filename.startswith(d):
+                #LOG.debug('ignoring %s under %s', filename, d)
                 #print 'ignoring %s under %s' % (filename, d)
                 return
-        #print '  %s line %s' % (func_name, line_no)
         interesting_locals = {
             n: v
             for n, v in frame.f_locals.items()

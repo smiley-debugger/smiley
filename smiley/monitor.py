@@ -29,40 +29,50 @@ class Monitor(command.Command):
         return parser
 
     def _process_message(self, msg):
-        print 'MESSAGE:', msg
         msg_type, msg_payload = msg
+        self.log.debug('MESSAGE: %s %r', msg_type, msg_payload)
+
         if msg_type == 'start_run':
-            print 'Starting new run:', msg_payload.get('command_line')
+            self.log.info(
+                'Starting new run: %s',
+                ' '.join(msg_payload.get('command_line', []))
+            )
+            self._cwd = msg_payload.get('cwd', '')
+            if self._cwd:
+                self._cwd = self._cwd.rstrip(os.sep) + os.sep
+
         elif msg_type == 'end_run':
-            print 'Finished run'
+            self.log.info('Finished run')
             if self._parsed_args.exit:
                 raise SystemExit()
+
         else:
-            #print msg_type, msg_payload
             line = linecache.getline(
                 msg_payload['filename'],
                 msg_payload['line_no'],
             ).rstrip()
             if msg_type == 'return':
-                print '%s:%4s: return>>> %s' % (
+                self.log.info(
+                    '%s:%4s: return>>> %s',
                     msg_payload['filename'],
                     msg_payload['line_no'],
                     msg_payload['arg'],
                 )
             else:
-                print '%s:%4s: %s' % (
+                self.log.info(
+                    '%s:%4s: %s',
                     msg_payload['filename'],
                     msg_payload['line_no'],
                     line,
                 )
                 if msg_payload.get('locals'):
                     for n, v in sorted(msg_payload['locals'].items()):
-                        print '%s       %s = %s' % (
+                        self.log.info(
+                            '%s       %s = %s',
                             ' ' * len(msg_payload['filename']),
                             n,
                             v,
                         )
-            print
 
     def take_action(self, parsed_args):
         self._parsed_args = parsed_args

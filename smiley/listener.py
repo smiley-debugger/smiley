@@ -1,6 +1,9 @@
 import json
+import logging
 
 import zmq
+
+LOG = logging.getLogger(__name__)
 
 
 class Listener(object):
@@ -16,7 +19,6 @@ class Listener(object):
     def poll_once(self, timeout=1000):
         for sock, reason in self.poller.poll(timeout):
             if reason != zmq.POLLIN:
-                print 'reason:', reason
                 return
             # Receiving data on the subscriber socket
             msg_type, msg_data = self.sub_socket.recv_multipart()
@@ -26,7 +28,7 @@ class Listener(object):
             ]
 
     def poll_forever(self, callback, timeout=1000):
-        print 'Waiting for incoming data'
+        LOG.debug('Waiting for incoming data')
         while True:
             try:
                 for m in self.poll_once(timeout):

@@ -1,6 +1,9 @@
 import json
+import logging
 
 import zmq
+
+LOG = logging.getLogger(__name__)
 
 
 class Publisher(object):
@@ -20,5 +23,5 @@ class Publisher(object):
             msg_type,
             json.dumps(data, default=self._json_special_types),
         ]
-        print 'SENDING:', msg
+        LOG.debug('SENDING: %r', msg)
         self.pub_socket.send_multipart(msg)
