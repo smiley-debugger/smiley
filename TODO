@@ -2,5 +2,4 @@
 - documentation
 - web app to browse history/activy of app
 - runner
-  - support command line arguments in apps being run
   - add exception handling for exceptions that cause the program to abend
