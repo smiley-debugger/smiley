@@ -1,0 +1,5 @@
+testrepository
+testtools
+python-subunit
+mock
+discover
