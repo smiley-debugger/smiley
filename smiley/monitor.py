@@ -1,5 +1,6 @@
 import linecache
 import logging
+import os
 
 from cliff import command
 
@@ -11,6 +12,8 @@ class Monitor(command.Command):
     """
 
     log = logging.getLogger(__name__)
+
+    _cwd = None
 
     def get_parser(self, prog_name):
         parser = super(Monitor, self).get_parser(prog_name)
@@ -47,21 +50,24 @@ class Monitor(command.Command):
                 raise SystemExit()
 
         else:
+            filename = msg_payload['filename']
+            if filename.startswith(self._cwd):
+                filename = filename[len(self._cwd):]
             line = linecache.getline(
-                msg_payload['filename'],
+                msg_payload['filename'],  # use the full name here
                 msg_payload['line_no'],
             ).rstrip()
             if msg_type == 'return':
                 self.log.info(
                     '%s:%4s: return>>> %s',
-                    msg_payload['filename'],
+                    filename,
                     msg_payload['line_no'],
                     msg_payload['arg'],
                 )
             else:
                 self.log.info(
                     '%s:%4s: %s',
-                    msg_payload['filename'],
+                    filename,
                     msg_payload['line_no'],
                     line,
                 )
@@ -69,7 +75,7 @@ class Monitor(command.Command):
                     for n, v in sorted(msg_payload['locals'].items()):
                         self.log.info(
                             '%s       %s = %s',
-                            ' ' * len(msg_payload['filename']),
+                            ' ' * len(filename),
                             n,
                             v,
                         )

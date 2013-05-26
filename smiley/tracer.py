@@ -96,6 +96,7 @@ class Tracer(object):
                 self.publisher.send(
                     'start_run',
                     {'run_id': self.run_id,
+                     'cwd': os.getcwd(),
                      'command_line': command_line},
                 )
                 execfile(command_line[0])
