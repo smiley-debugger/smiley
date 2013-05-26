@@ -1,5 +1,5 @@
-- build cli to run apps
-- build cli to listen and show activity of apps
+- add exception handling for exceptions that cause the program to abend
+- update the import path for runner to include `pwd` at start
 - build cli to listen and record activity of apps
 - documentation
-- web app to browse history/activyt of app
+- web app to browse history/activy of app
