@@ -1,4 +1,6 @@
 import logging
+import os
+import sys
 
 from cliff import command
 
@@ -26,6 +28,9 @@ class Run(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        cwd = os.getcwd()
+        if cwd not in sys.path and os.curdir not in sys.path:
+            sys.path.insert(0, cwd)
         p = publisher.Publisher(parsed_args.socket)
         t = tracer.Tracer(p)
         t.run(parsed_args.command)
