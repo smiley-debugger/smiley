@@ -1,3 +1,4 @@
+import sys
 
 def gen(m):
     for i in xrange(m):
@@ -7,7 +8,7 @@ def gen(m):
 def c(input):
     print 'input =', input
     data = list(gen(input))
-    print 'Leaving c()'
+    print 'Leaving c()', data
 
 
 def b(arg):
