@@ -4,6 +4,8 @@ from cliff import command
 
 
 class Run(command.Command):
+    """Run another program with monitoring enabled.
+    """
 
     log = logging.getLogger(__name__)
 
@@ -15,11 +17,10 @@ class Run(command.Command):
             help='the command to spy on',
         )
         parser.add_argument(
-            '--publish-url',
-            '-u',
+            '--socket',
             default='tcp://127.0.0.1:5556',
-            help='URL where the listener will be (%(default)s)',
-            )
+            help='URL for the socket where the listener will be (%(default)s)',
+        )
         return parser
 
     def take_action(self, parsed_args):
