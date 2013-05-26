@@ -3,15 +3,23 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Smiley's documentation!
-==================================
+=====================================
+ smiley -- Python Application Tracer
+=====================================
+
+Smiley is a tool for spying on your Python programs and recording
+their activities. It can be used for post-mortem debugging,
+performance analysis, or simply understanding what parts of a complex
+program are actually used in different code paths.
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
-
+   quickstart
+   command_ref
+   faq
 
 Indices and tables
 ==================
