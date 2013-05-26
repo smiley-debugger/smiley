@@ -45,20 +45,8 @@ class Tracer(object):
         self.publisher = publisher
         self.run_id = None
 
-    def _send_notice(self, frame, event, arg):
-        co = frame.f_code
-        func_name = co.co_name
-        line_no = frame.f_lineno
-        # Expand the filename path to include the full directory so we
-        # can decide whether to ignore it or not, and so the remote
-        # side knows *exactly* which file we are looking at.
-        filename = os.path.abspath(co.co_filename)
-        for d in IGNORE_DIRS:
-            if filename.startswith(d):
-                #LOG.debug('ignoring %s under %s', filename, d)
-                #print 'ignoring %s under %s' % (filename, d)
-                return
-        interesting_locals = {
+    def _get_interesting_locals(self, frame):
+        return {
             n: v
             for n, v in frame.f_locals.items()
             # Ignore any modules, methods, or functions that have made
@@ -68,6 +56,22 @@ class Tracer(object):
                 and not inspect.ismethod(v)
                 and (n[:2] != '__' and n[-2:] != '__'))
         }
+
+    def _should_ignore_file(self, filename):
+        for d in IGNORE_DIRS:
+            if filename.startswith(d):
+                return True
+        return False
+
+    def _send_notice(self, frame, event, arg):
+        co = frame.f_code
+        func_name = co.co_name
+        line_no = frame.f_lineno
+        # Expand the filename path to include the full directory so we
+        # can decide whether to ignore it or not, and so the remote
+        # side knows *exactly* which file we are looking at.
+        filename = os.path.abspath(co.co_filename)
+        interesting_locals = self._get_interesting_locals(frame)
         self.publisher.send(
             event,
             {'func_name': func_name,
@@ -81,10 +85,8 @@ class Tracer(object):
 
     def trace_calls(self, frame, event, arg):
         co = frame.f_code
-        filename = co.co_filename
-        # Need to look at the module to be prefixed with smiley
-        if filename in (__file__,):
-            # Ignore ourself and the push module
+        filename = os.path.abspath(co.co_filename)
+        if self._should_ignore_file(filename):
             return
         self._send_notice(frame, event, arg)
         return self.trace_calls
