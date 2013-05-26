@@ -1,3 +1,5 @@
+import json
+
 import zmq
 
 
@@ -17,7 +19,11 @@ class Listener(object):
                 print 'reason:', reason
                 return
             # Receiving data on the subscriber socket
-            yield self.sub_socket.recv_multipart()
+            msg_type, msg_data = self.sub_socket.recv_multipart()
+            yield [
+                msg_type,
+                json.loads(msg_data),
+            ]
 
     def poll_forever(self, callback, timeout=1000):
         print 'Waiting for incoming data'
