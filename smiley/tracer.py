@@ -8,6 +8,10 @@ import sys
 import time
 import uuid
 
+import coverage
+from coverage.execfile import run_python_file
+from coverage.misc import ExceptionDuringRun
+
 import smiley
 
 LOG = logging.getLogger(__name__)
@@ -21,7 +25,7 @@ LOG = logging.getLogger(__name__)
 # spread across a few locations. Look at all the candidate modules
 # we've imported, and take all the different ones.
 IGNORE_DIRS = set()
-for m in (smiley, atexit, os, random, socket):
+for m in (smiley, coverage, atexit, os, random, socket):
     if hasattr(m, "__file__"):
         IGNORE_DIRS.add(os.path.dirname(m.__file__).rstrip(os.sep) + os.sep)
 
@@ -44,6 +48,7 @@ class Tracer(object):
     def __init__(self, publisher):
         self.publisher = publisher
         self.run_id = None
+        self.canonical_filenames = {}
 
     def _get_interesting_locals(self, frame):
         return {
@@ -58,6 +63,11 @@ class Tracer(object):
         }
 
     def _should_ignore_file(self, filename):
+        if not filename:
+            return True
+        if filename.endswith('>'):
+            # builtins?
+            return True
         for d in IGNORE_DIRS:
             if filename.startswith(d):
                 return True
@@ -85,7 +95,15 @@ class Tracer(object):
 
     def trace_calls(self, frame, event, arg):
         co = frame.f_code
-        filename = os.path.abspath(co.co_filename)
+        filename = co.co_filename
+        if filename is not None:
+            canonical = self.canonical_filenames.get(filename)
+            if canonical is not None:
+                filename = canonical
+            else:
+                full = os.path.abspath(filename)
+                self.canonical_filenames[filename] = full
+                filename = full
         if self._should_ignore_file(filename):
             return
         self._send_notice(frame, event, arg)
@@ -101,8 +119,20 @@ class Tracer(object):
                      'cwd': os.getcwd(),
                      'command_line': command_line},
                 )
-                execfile(command_line[0],
-                         {'__name__': '__main__'})
+                run_python_file(
+                    command_line[0],
+                    command_line,
+                )
+        except ExceptionDuringRun as err:
+            # TODO: Include more details about the traceback.
+            self.publisher.send(
+                'exception',
+                {'run_id': self.run_id,
+                 'message': unicode(err),
+                 'error': err,
+                 'filename': '',
+                 },
+            )
         finally:
             self.publisher.send(
                 'end_run',

@@ -1,2 +1,3 @@
 cliff
 pyzmq
+coverage

@@ -49,6 +49,12 @@ class Monitor(command.Command):
             if self._parsed_args.exit:
                 raise SystemExit()
 
+        elif msg_type == 'exception':
+            # TODO: Report more details.
+            self.log.info('ERROR in app: %s', msg_payload['message'])
+            if self._parsed_args.exit:
+                raise SystemExit()
+
         else:
             filename = msg_payload['filename']
             if filename.startswith(self._cwd):
