@@ -20,6 +20,7 @@ Contents:
    quickstart
    command_ref
    faq
+   history
 
 Indices and tables
 ==================

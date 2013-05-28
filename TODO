@@ -8,3 +8,5 @@
 - replay
   - read recorded activity log
   - web app to browse history/activy of app
+- performance
+  - cache the locals values for non-native types and only send updates if the signature changes? how to indicate "the same version of foo as before"?
