@@ -1,5 +1,5 @@
 ===========================================
- Smiley 0.1.0 -- Python Application Tracer
+ Smiley 0.2.0 -- Python Application Tracer
 ===========================================
 
 .. tags:: smiley release python
@@ -11,21 +11,17 @@ What is smiley?
 
 Smiley_ includes several subcommands for running Python programs and
 monitoring all of the internal details for recording and
-reporting. For more details, see the `README on PyPI
-<https://pypi.python.org/pypi/smiley>`__.
+reporting. For more details, see the documentation_.
 
 What's New?
 ===========
 
-This is the first public release of Smiley, and it is very early in
-its development.
+1. Use the script runner code from coverage_ instead of reinventing it.
+2. Documentation_ uploaded to readthedocs.org.
 
-What's with the name?
-=====================
-
-`George Smiley`_ is a character in popular spy novels by John LeCarre.
-
-.. _George Smiley: http://en.wikipedia.org/wiki/George_Smiley
-
+.. _coverage: https://pypi.python.org/pypi/coverage
 
 .. _smiley: https://github.com/dhellmann/smiley
+
+.. _documentation: https://smiley.readthedocs.org/en/latest/
+
