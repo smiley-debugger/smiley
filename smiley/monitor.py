@@ -2,12 +2,10 @@ import linecache
 import logging
 import os
 
-from cliff import command
-
-from smiley import listener
+from smiley import listen_cmd
 
 
-class Monitor(command.Command):
+class Monitor(listen_cmd.ListeningCommand):
     """Listen for running programs and show their progress.
     """
 
@@ -17,12 +15,6 @@ class Monitor(command.Command):
 
     def get_parser(self, prog_name):
         parser = super(Monitor, self).get_parser(prog_name)
-        parser.add_argument(
-            '--socket',
-            dest='socket',
-            default='tcp://127.0.0.1:5556',
-            help='URL for the socket where to monitor on (%(default)s)',
-        )
         parser.add_argument(
             '--exit',
             default=False,
@@ -88,9 +80,3 @@ class Monitor(command.Command):
                             n,
                             v,
                         )
-
-    def take_action(self, parsed_args):
-        self._parsed_args = parsed_args
-        l = listener.Listener(parsed_args.socket)
-        l.poll_forever(self._process_message)
-        return
