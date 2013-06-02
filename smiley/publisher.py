@@ -2,6 +2,7 @@ import json
 import logging
 
 import zmq
+import sys
 
 LOG = logging.getLogger(__name__)
 
@@ -19,9 +20,17 @@ class Publisher(object):
         return repr(obj)
 
     def send(self, msg_type, data):
-        msg = [
-            msg_type,
-            json.dumps(data, default=self._json_special_types),
-        ]
-        LOG.debug('SENDING: %r', msg)
-        self.pub_socket.send_multipart(msg)
+        old_trace = None
+        try:
+            old_trace = sys.gettrace()
+            sys.settrace(None)
+            msg = [
+                msg_type,
+                json.dumps(data, default=self._json_special_types),
+            ]
+            LOG.debug('SENDING: %r', msg)
+            self.pub_socket.send_multipart(msg)
+        finally:
+            if old_trace is not None:
+                sys.settrace(old_trace)
+
