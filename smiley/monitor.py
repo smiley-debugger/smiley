@@ -51,7 +51,7 @@ class Monitor(command.Command):
 
         elif msg_type == 'exception':
             # TODO: Report more details.
-            self.log.info('ERROR in app: %s', msg_payload['message'])
+            self.log.info('ERROR in app: %s', msg_payload.get('message', msg_payload))
             if self._parsed_args.exit:
                 raise SystemExit()
 
