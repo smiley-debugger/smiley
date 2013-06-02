@@ -57,7 +57,7 @@ class Monitor(command.Command):
 
         else:
             filename = msg_payload['filename']
-            if filename.startswith(self._cwd):
+            if self._cwd and filename.startswith(self._cwd):
                 filename = filename[len(self._cwd):]
             line = linecache.getline(
                 msg_payload['filename'],  # use the full name here
