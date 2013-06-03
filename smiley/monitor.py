@@ -51,13 +51,13 @@ class Monitor(command.Command):
 
         elif msg_type == 'exception':
             # TODO: Report more details.
-            self.log.info('ERROR in app: %s', msg_payload['message'])
+            self.log.info('ERROR in app: %s', msg_payload.get('message', msg_payload))
             if self._parsed_args.exit:
                 raise SystemExit()
 
         else:
             filename = msg_payload['filename']
-            if filename.startswith(self._cwd):
+            if self._cwd and filename.startswith(self._cwd):
                 filename = filename[len(self._cwd):]
             line = linecache.getline(
                 msg_payload['filename'],  # use the full name here
