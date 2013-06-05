@@ -33,4 +33,3 @@ class Publisher(object):
         finally:
             if old_trace is not None:
                 sys.settrace(old_trace)
-
