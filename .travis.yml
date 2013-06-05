@@ -1,0 +1,10 @@
+language: python
+python:
+  - "2.7"
+install:
+  - pip install flake8 --use-mirrors
+  - pip install -r requirements.txt -r test-requirements.txt --use-mirrors
+  - pip install -q . --use-mirrors
+before_script:
+  - flake8 smiley tests
+script: python setup.py testr --testr-args='--concurrency=1'
