@@ -117,7 +117,8 @@ class Tracer(object):
                     'start_run',
                     {'run_id': self.run_id,
                      'cwd': os.getcwd(),
-                     'command_line': command_line},
+                     'command_line': command_line,
+                     'timestamp': time.time()},
                 )
                 run_python_file(
                     command_line[0],
@@ -136,6 +137,7 @@ class Tracer(object):
         finally:
             self.publisher.send(
                 'end_run',
-                {'run_id': self.run_id},
+                {'run_id': self.run_id,
+                 'timestamp': time.time()},
             )
             self.run_id = None
