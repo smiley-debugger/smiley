@@ -1,0 +1,52 @@
+import contextlib
+import logging
+import pkgutil
+import sqlite3
+
+LOG = logging.getLogger(__name__)
+
+
+@contextlib.contextmanager
+def transaction(conn):
+    c = conn.cursor()
+    try:
+        yield c
+    except:
+        conn.rollback()
+        raise
+    else:
+        conn.commit()
+
+
+class DB(object):
+    """Database connection and API.
+    """
+
+    def __init__(self, name):
+        self.conn = sqlite3.connect(name)
+        # Use Row, instead of just lists/tuples
+        self.conn.row_factory = sqlite3.Row
+        # Try to select some data and create the schema if we can't.
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute('select * from run')
+            LOG.debug('database already initialized')
+        except sqlite3.OperationalError:
+            LOG.debug('initializing database')
+            schema = pkgutil.get_data('smiley', 'schema.sql')
+            cursor.executescript(schema)
+        return
+
+    def start_run(self, run_id, cwd, description, start_time):
+        "Record the beginning of a run."
+        with transaction(self.conn) as c:
+            c.execute(
+                """
+                INSERT INTO run (id, cwd, description, start_time)
+                VALUES (:id, :cwd, :description, :start_time)
+                """,
+                {'id': run_id,
+                 'cwd': cwd,
+                 'description': description,
+                 'start_time': start_time}
+            )
