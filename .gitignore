@@ -40,3 +40,6 @@ ChangeLog
 
 # testrepository
 .testrepository
+
+# Smiley database
+smiley.db
