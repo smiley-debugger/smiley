@@ -125,11 +125,13 @@ class Tracer(object):
                     command_line,
                 )
         except ExceptionDuringRun as err:
+            # Unpack the wrapped exception
+            err_type, orig_err, traceback = err.args
             self.publisher.send(
                 'end_run',
                 {'run_id': self.run_id,
-                 'message': unicode(err),
-                 'error': err,
+                 'message': unicode(orig_err),
+                 'traceback': traceback,
                  'timestamp': time.time(),
                  },
             )
