@@ -38,15 +38,11 @@ class Monitor(listen_cmd.ListeningCommand):
 
         elif msg_type == 'end_run':
             self.log.info('Finished run')
-            if self._parsed_args.exit:
-                raise SystemExit()
-
-        elif msg_type == 'exception':
-            # TODO: Report more details.
-            self.log.info(
-                'ERROR in app: %s',
-                msg_payload.get('message', msg_payload),
-            )
+            if msg_payload.get('message'):
+                self.log.info(
+                    'ERROR in app: %s',
+                    msg_payload.get('message', msg_payload),
+                )
             if self._parsed_args.exit:
                 raise SystemExit()
 

@@ -125,19 +125,21 @@ class Tracer(object):
                     command_line,
                 )
         except ExceptionDuringRun as err:
-            # TODO: Include more details about the traceback.
-            self.publisher.send(
-                'exception',
-                {'run_id': self.run_id,
-                 'message': unicode(err),
-                 'error': err,
-                 'filename': '',
-                 },
-            )
-        finally:
             self.publisher.send(
                 'end_run',
                 {'run_id': self.run_id,
-                 'timestamp': time.time()},
+                 'message': unicode(err),
+                 'error': err,
+                 'timestamp': time.time(),
+                 },
+            )
+        else:
+            self.publisher.send(
+                'end_run',
+                {'run_id': self.run_id,
+                 'timestamp': time.time(),
+                 'error': None,
+                 'message': None,
+                 },
             )
             self.run_id = None
