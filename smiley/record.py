@@ -39,7 +39,7 @@ class Record(listen_cmd.ListeningCommand):
             if self._cwd:
                 self._cwd = self._cwd.rstrip(os.sep) + os.sep
             self.db.start_run(
-                run_id=msg_payload.get('run_id'),
+                run_id=msg_payload['run_id'],
                 cwd=self._cwd,
                 description=command_line,
                 start_time=msg_payload.get('timestamp'),
@@ -47,14 +47,12 @@ class Record(listen_cmd.ListeningCommand):
 
         elif msg_type == 'end_run':
             self.log.info('Finished run')
-            if self._parsed_args.exit:
-                raise SystemExit()
-
-        elif msg_type == 'exception':
-            # TODO: Report more details.
-            self.log.info('ERROR in app: %s', msg_payload['message'])
-            # FIXME: Take this out when debugging is done
-            raise SystemExit()
+            self.db.end_run(
+                run_id=msg_payload['run_id'],
+                end_time=msg_payload.get('timestamp'),
+                message=msg_payload.get('message'),
+                traceback=msg_payload.get('traceback'),
+            )
 
         else:
             filename = msg_payload['filename']

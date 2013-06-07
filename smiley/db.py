@@ -50,3 +50,21 @@ class DB(object):
                  'description': description,
                  'start_time': start_time}
             )
+
+    def end_run(self, run_id, end_time, message, traceback):
+        "Record the end of a run."
+        with transaction(self.conn) as c:
+            c.execute(
+                """
+                UPDATE run
+                SET
+                    end_time = :end_time,
+                    error_message = :message,
+                    traceback = :traceback
+                WHERE id = :id
+                """,
+                {'id': run_id,
+                 'end_time': end_time,
+                 'message': message,
+                 'traceback': traceback},
+            )

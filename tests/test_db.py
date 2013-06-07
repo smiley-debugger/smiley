@@ -2,6 +2,7 @@ import fixtures
 import testtools
 
 from smiley import db
+from smiley import publisher
 
 
 class TransactionTest(testtools.TestCase):
@@ -82,3 +83,52 @@ class DBTest(testtools.TestCase):
         self.assertEqual(row['end_time'], None)
         self.assertEqual(row['error_message'], None)
         self.assertEqual(row['traceback'], None)
+
+    def test_end_run_clean(self):
+        self.db.start_run(
+            '12345',
+            '/no/such/dir',
+            'command line would go here',
+            1370436103.65,
+        )
+        self.db.end_run(
+            '12345',
+            1370436104.65,
+            message=None,
+            traceback=None,
+        )
+        c = self.db.conn.cursor()
+        c.execute('select * from run')
+        data = c.fetchall()
+        self.assertEqual(len(data), 1)
+        row = data[0]
+        self.assertEqual(row['id'], '12345')
+        self.assertEqual(row['start_time'], 1370436103.65)
+        self.assertEqual(row['end_time'], 1370436104.65)
+
+    def test_end_run_traceback(self):
+        self.db.start_run(
+            '12345',
+            '/no/such/dir',
+            'command line would go here',
+            1370436103.65,
+        )
+        try:
+            raise RuntimeError('test exception')
+        except RuntimeError as err:
+            import sys
+            self.db.end_run(
+                '12345',
+                1370436104.65,
+                message=unicode(err),
+                traceback=publisher._get_json(sys.exc_info()[-1]),
+            )
+        c = self.db.conn.cursor()
+        c.execute('select * from run')
+        data = c.fetchall()
+        self.assertEqual(len(data), 1)
+        row = data[0]
+        self.assertEqual(row['id'], '12345')
+        self.assertEqual(row['error_message'], 'test exception')
+        # FIXME: Need to serialize the traceback better
+        assert 'traceback' in row['traceback']
