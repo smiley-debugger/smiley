@@ -93,7 +93,7 @@ class OutputFormatter(processor.EventProcessor):
                 trace_arg,
             )
         elif event == 'exception':
-            self.log.info(
+            self.log.warn(
                 '%s:%4s: Exception:',
                 display_filename,
                 line_no,
