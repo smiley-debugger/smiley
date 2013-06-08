@@ -21,6 +21,18 @@ class JSONTest(testtools.TestCase):
             actual = jsonutil._json_special_types(sys.exc_info()[-1])
         self.assertEqual(actual, expected)
 
+    def test_exception(self):
+        try:
+            raise RuntimeError('here')
+        except RuntimeError as err:
+            actual = jsonutil._json_special_types(err)
+        expected = {
+            '__class__': 'RuntimeError',
+            '__module__': 'exceptions',
+            'args': ('here',),
+        }
+        self.assertEqual(actual, expected)
+
     def test_arbitrary_object(self):
         class Foo(object):
             def __init__(self):

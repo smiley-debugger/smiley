@@ -13,6 +13,11 @@ def _json_special_types(obj):
         data = dict(vars(obj))
         data['__class__'] = obj.__class__.__name__
         data['__module__'] = obj.__class__.__module__
+        if isinstance(obj, Exception) and 'args' not in data:
+            try:
+                data['args'] = obj.args
+            except AttributeError:
+                pass
     except Exception:
         data = repr(obj)
     return data
