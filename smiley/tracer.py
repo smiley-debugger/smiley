@@ -59,7 +59,8 @@ class Tracer(object):
             if (not inspect.ismodule(v)
                 and not inspect.isfunction(v)
                 and not inspect.ismethod(v)
-                and getattr(getattr(v, '__class__'), '__module__') != '__future__'
+                and getattr(getattr(v, '__class__'),
+                            '__module__') != '__future__'
                 and (n[:2] != '__' and n[-2:] != '__'))
         }
 

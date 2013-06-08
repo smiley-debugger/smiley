@@ -13,7 +13,7 @@ def _json_special_types(obj):
         data = dict(vars(obj))
         data['__class__'] = obj.__class__.__name__
         data['__module__'] = obj.__class__.__module__
-    except Exception as err:
+    except Exception:
         data = repr(obj)
     return data
 
