@@ -1,8 +1,35 @@
+import itertools
 import linecache
 import logging
 import os
+import pprint
+import sys
+
+import prettytable
 
 from smiley.commands import listen_cmd
+
+
+def dump_dictionary(d, stdout, indent=4):
+    x = prettytable.PrettyTable(field_names=('Variable', 'Value'),
+                                print_empty=False)
+    x.padding_width = 1
+    # Align all columns left because the values are
+    # not all the same type.
+    x.align['Variable'] = 'l'
+    x.align['Value'] = 'l'
+    for name, value in sorted(d.items()):
+        formatted_value = pprint.pformat(value, width=60)
+        pairs = itertools.izip(
+            itertools.chain([name], itertools.repeat('')),
+            formatted_value.splitlines())
+        for name, value in pairs:
+            x.add_row((name, value))
+    formatted = x.get_string(fields=('Variable', 'Value'))
+    indent_spaces = ' ' * 4
+    for line in formatted.splitlines():
+        stdout.write(indent_spaces + line + '\n')
+    return
 
 
 class Monitor(listen_cmd.ListeningCommand):
@@ -81,10 +108,4 @@ class Monitor(listen_cmd.ListeningCommand):
                     line,
                 )
                 if msg_payload.get('locals'):
-                    for n, v in sorted(msg_payload['locals'].items()):
-                        self.log.info(
-                            '%s       %s = %s',
-                            ' ' * len(filename),
-                            n,
-                            v,
-                        )
+                    dump_dictionary(msg_payload['locals'], sys.stdout)

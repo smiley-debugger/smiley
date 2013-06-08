@@ -28,8 +28,24 @@ def produce_error():
         print('Error:', err)
 
 
+def large_data_structure():
+    big_data = {
+        'key': {
+            'nested_key': 'nested_value',
+            'further': {
+                'deeper': [
+                    'lots of values',
+                    'in this list',
+                ],
+            },
+        },
+    }
+    big_data['key2'] = 'key'
+
+
 def a():
     print('args:', sys.argv)
     b(2)
     produce_error()
+    large_data_structure()
     print('Leaving a()')
