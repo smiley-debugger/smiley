@@ -32,6 +32,12 @@ class List(lister.Lister):
             default='smiley.db',
             help='filename for the database (%(default)s)',
         )
+        parser.add_argument(
+            '--errors',
+            default=False,
+            action='store_true',
+            help='only include runs with errors',
+        )
         return parser
 
     def take_action(self, parsed_args):
@@ -41,5 +47,5 @@ class List(lister.Lister):
                  _format_timestamp(r.start_time),
                  _format_timestamp(r.end_time),
                  r.error_message)
-                for r in self.db.get_runs())
+                for r in self.db.get_runs(only_errors=parsed_args.errors))
         return (self.DEFAULT_COLUMNS, runs)

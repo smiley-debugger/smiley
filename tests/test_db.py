@@ -225,11 +225,29 @@ class QueryTest(testtools.TestCase):
             local_vars=self.local_values,
             timestamp=1370436104.65,
         )
+        self.db.start_run(
+            '6789',
+            '/no/such/dir',
+            ['command', 'line', 'would', 'go', 'here'],
+            1370436103.65,
+        )
+        self.db.end_run(
+            '6789',
+            1370436104.65,
+            'error message',
+            None,
+        )
 
     def test_get_runs(self):
         runs = list(self.db.get_runs())
-        self.assertEqual(len(runs), 1)
+        self.assertEqual(len(runs), 2)
         self.assertEqual(runs[0].id, '12345')
+        self.assertEqual(runs[1].id, '6789')
+
+    def test_get_runs_errors(self):
+        runs = list(self.db.get_runs(True))
+        self.assertEqual(len(runs), 1)
+        self.assertEqual(runs[0].id, '6789')
 
     def test_get_run(self):
         run = self.db.get_run('12345')

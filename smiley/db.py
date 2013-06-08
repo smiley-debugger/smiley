@@ -144,10 +144,14 @@ class DB(processor.EventProcessor):
                  }
             )
 
-    def get_runs(self):
+    def get_runs(self, only_errors=False):
         "Return the run data."
+        query = ["SELECT * FROM run"]
+        if only_errors:
+            query.append("WHERE error_message is not null")
+        query.append("ORDER BY start_time")
         with transaction(self.conn) as c:
-            c.execute("SELECT * FROM run ORDER BY start_time",)
+            c.execute(' '.join(query))
             return (_make_run(r) for r in c.fetchall())
 
     def get_run(self, run_id):
