@@ -114,6 +114,25 @@ class DB(processor.EventProcessor):
                  'traceback': jsonutil.dumps(traceback)},
             )
 
+    def get_runs(self, only_errors=False):
+        "Return the run data."
+        query = ["SELECT * FROM run"]
+        if only_errors:
+            query.append("WHERE error_message is not null")
+        query.append("ORDER BY start_time")
+        with transaction(self.conn) as c:
+            c.execute(' '.join(query))
+            return (_make_run(r) for r in c.fetchall())
+
+    def get_run(self, run_id):
+        "Return the run data."
+        with transaction(self.conn) as c:
+            c.execute(
+                "SELECT * FROM run WHERE id = :run_id",
+                {'run_id': run_id},
+            )
+            return _make_run(c.fetchone())
+
     def trace(self, run_id, event,
               func_name, line_no, filename,
               trace_arg, local_vars,
@@ -143,25 +162,6 @@ class DB(processor.EventProcessor):
                  'timestamp': timestamp,
                  }
             )
-
-    def get_runs(self, only_errors=False):
-        "Return the run data."
-        query = ["SELECT * FROM run"]
-        if only_errors:
-            query.append("WHERE error_message is not null")
-        query.append("ORDER BY start_time")
-        with transaction(self.conn) as c:
-            c.execute(' '.join(query))
-            return (_make_run(r) for r in c.fetchall())
-
-    def get_run(self, run_id):
-        "Return the run data."
-        with transaction(self.conn) as c:
-            c.execute(
-                "SELECT * FROM run WHERE id = :run_id",
-                {'run_id': run_id},
-            )
-            return _make_run(c.fetchone())
 
     def get_trace(self, run_id):
         "Return the run data."
