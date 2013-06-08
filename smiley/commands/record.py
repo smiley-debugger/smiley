@@ -28,24 +28,13 @@ class Record(listen_cmd.ListeningCommand):
         msg_type, msg_payload = msg
         self.log.debug('MESSAGE: %s %r', msg_type, msg_payload)
 
-        # TODO: Make sure the file appears in our cache.
-        #       - use a simple hash signature
-        #       - assume unique for life of a "run"
-
-        # filename = msg_payload['filename']
-        # if filename.startswith(self._cwd):
-        #     filename = filename[len(self._cwd):]
-        # line = linecache.getline(
-        #     msg_payload['filename'],  # use the full name here
-        #     msg_payload['line_no'],
-        # ).rstrip()
-
         if msg_type == 'start_run':
             command_line = ' '.join(msg_payload.get('command_line', []))
             self.log.info(
                 'Starting new run: %s',
                 command_line,
             )
+            self._cached_files = set()
             self._cwd = msg_payload.get('cwd', '')
             if self._cwd:
                 self._cwd = self._cwd.rstrip(os.sep) + os.sep
@@ -77,8 +66,21 @@ class Record(listen_cmd.ListeningCommand):
                 timestamp=msg_payload.get('timestamp'),
             )
 
+        filename = msg_payload.get('filename')
+        if filename and filename not in self._cached_files:
+            # Should we be decoding the text file here?
+            with open(filename, 'rb') as f:
+                body = f.read()
+            self.db.cache_file_for_run(
+                msg_payload['run_id'],
+                msg_payload['filename'],
+                body,
+            )
+            # Track the files we have cached so we do not need to
+            # re-cache them for the same run.
+            self._cached_files.add(msg_payload['filename'])
+
     def take_action(self, parsed_args):
-        # setup the database
         self.db = db.DB(parsed_args.database)
-        # Listen...
+        self._cached_files = set()
         return super(Record, self).take_action(parsed_args)
