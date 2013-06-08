@@ -1,5 +1,4 @@
 import itertools
-import linecache
 import logging
 import os
 import pprint
@@ -38,8 +37,8 @@ class OutputFormatter(processor.EventProcessor):
 
     _cwd = None
 
-    # def __init__(self, line_source):
-    #     self._line_source = line_source
+    def __init__(self, line_source):
+        self._line_source = line_source
 
     def _get_display_filename(self, filename):
         "Truncate the filename for display."
@@ -65,8 +64,7 @@ class OutputFormatter(processor.EventProcessor):
               func_name, line_no, filename,
               trace_arg, local_vars,
               timestamp):
-        # FIXME: Pass a line source to the output formatter
-        line = linecache.getline(
+        line = self._line_source(
             filename,
             line_no,
         ).rstrip()

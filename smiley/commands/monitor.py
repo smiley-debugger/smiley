@@ -1,3 +1,4 @@
+import linecache
 import logging
 import os
 
@@ -22,7 +23,7 @@ class Monitor(listen_cmd.ListeningCommand):
         return parser
 
     def take_action(self, parsed_args):
-        self.out = output.OutputFormatter()
+        self.out = output.OutputFormatter(linecache.getline)
         super(Monitor, self).take_action(parsed_args)
 
     def _process_message(self, msg):
