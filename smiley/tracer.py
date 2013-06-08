@@ -47,6 +47,7 @@ class Tracer(object):
 
     def __init__(self, publisher):
         self.publisher = publisher
+        # FIXME: Use a thread-local
         self.run_id = None
         self.canonical_filenames = {}
 
@@ -86,16 +87,16 @@ class Tracer(object):
         # side knows *exactly* which file we are looking at.
         filename = os.path.abspath(co.co_filename)
         interesting_locals = self._get_interesting_locals(frame)
-        self.publisher.send(
-            event,
-            {'func_name': func_name,
-             'line_no': line_no,
-             'filename': filename,
-             'arg': arg,
-             'local_vars': interesting_locals,
-             'timestamp': time.time(),
-             'run_id': self.run_id,
-             })
+        self.publisher.trace(
+            run_id=self.run_id,
+            event=event,
+            func_name=func_name,
+            line_no=line_no,
+            filename=filename,
+            trace_arg=arg,
+            local_vars=interesting_locals,
+            timestamp=time.time(),
+        )
 
     def trace_calls(self, frame, event, arg):
         co = frame.f_code
@@ -117,12 +118,11 @@ class Tracer(object):
         self.run_id = str(uuid.uuid4())
         try:
             with TracerContext(self):
-                self.publisher.send(
-                    'start_run',
-                    {'run_id': self.run_id,
-                     'cwd': os.getcwd(),
-                     'command_line': command_line,
-                     'timestamp': time.time()},
+                self.publisher.start_run(
+                    self.run_id,
+                    os.getcwd(),
+                    command_line,
+                    time.time(),
                 )
                 run_python_file(
                     command_line[0],
@@ -132,23 +132,19 @@ class Tracer(object):
             # Unpack the wrapped exception
             err_type, orig_err, traceback = err.args
             try:
-                self.publisher.send(
-                    'end_run',
-                    {'run_id': self.run_id,
-                     'message': unicode(orig_err),
-                     'traceback': traceback,
-                     'timestamp': time.time(),
-                     },
+                self.publisher.end_run(
+                    self.run_id,
+                    end_time=time.time(),
+                    message=unicode(orig_err),
+                    traceback=traceback,
                 )
             finally:
                 del traceback  # remove circular reference for GC
         else:
-            self.publisher.send(
-                'end_run',
-                {'run_id': self.run_id,
-                 'timestamp': time.time(),
-                 'error': None,
-                 'message': None,
-                 },
+            self.publisher.end_run(
+                self.run_id,
+                time.time(),
+                error=None,
+                message=None,
             )
             self.run_id = None

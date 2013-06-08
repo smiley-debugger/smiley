@@ -6,6 +6,8 @@ import pprint
 
 import prettytable
 
+from smiley import processor
+
 
 def dump_dictionary(d, write, indent=4):
     x = prettytable.PrettyTable(field_names=('Variable', 'Value'),
@@ -30,7 +32,7 @@ def dump_dictionary(d, write, indent=4):
     return
 
 
-class OutputFormatter(object):
+class OutputFormatter(processor.EventProcessor):
 
     log = logging.getLogger(__name__)
 

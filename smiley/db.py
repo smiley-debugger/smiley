@@ -4,6 +4,7 @@ import pkgutil
 import sqlite3
 
 from smiley import jsonutil
+from smiley import processor
 
 LOG = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ def transaction(conn):
         conn.commit()
 
 
-class DB(object):
+class DB(processor.EventProcessor):
     """Database connection and API.
     """
 

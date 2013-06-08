@@ -30,7 +30,7 @@ class PublisherTest(testtools.TestCase):
             'key': 'value',
             'key2': ['v1', 1],
         }
-        p.send('message type name', msg)
+        p._send('message type name', msg)
         s = socket.return_value
         s.send_multipart.assert_called_with(
             ['message type name', json.dumps(msg)]
