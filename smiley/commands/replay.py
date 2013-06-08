@@ -5,6 +5,7 @@ import os
 from cliff import command
 
 from smiley import db
+from smiley import db_linecache
 from smiley import output
 
 
@@ -33,18 +34,6 @@ class Replay(command.Command):
     def _process_message(self, msg):
         msg_type, msg_payload = msg
         self.log.debug('MESSAGE: %s %r', msg_type, msg_payload)
-
-        # TODO: Make sure the file appears in our cache.
-        #       - use a simple hash signature
-        #       - assume unique for life of a "run"
-
-        # filename = msg_payload['filename']
-        # if filename.startswith(self._cwd):
-        #     filename = filename[len(self._cwd):]
-        # line = linecache.getline(
-        #     msg_payload['filename'],  # use the full name here
-        #     msg_payload['line_no'],
-        # ).rstrip()
 
         if msg_type == 'start_run':
             command_line = ' '.join(msg_payload.get('command_line', []))
@@ -84,8 +73,9 @@ class Replay(command.Command):
             )
 
     def take_action(self, parsed_args):
-        self.out = output.OutputFormatter(linecache.getline)
         self.db = db.DB(parsed_args.database)
+        cache = db_linecache.DBLineCache(self.db, parsed_args.run_id)
+        self.out = output.OutputFormatter(cache.getline)
 
         run_details = self.db.get_run(parsed_args.run_id)
         self.out.start_run(
