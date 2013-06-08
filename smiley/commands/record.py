@@ -2,7 +2,7 @@ import logging
 import os
 
 from smiley import db
-from smiley import listen_cmd
+from smiley.commands import listen_cmd
 
 
 class Record(listen_cmd.ListeningCommand):

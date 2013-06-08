@@ -16,7 +16,7 @@ class Smiley(app.App):
         super(Smiley, self).__init__(
             description='smiley spies on your apps as they run',
             version=dist.version,
-            command_manager=commandmanager.CommandManager('smiley'),
+            command_manager=commandmanager.CommandManager('smiley.commands'),
         )
 
 

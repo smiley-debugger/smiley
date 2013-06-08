@@ -2,7 +2,7 @@ import linecache
 import logging
 import os
 
-from smiley import listen_cmd
+from smiley.commands import listen_cmd
 
 
 class Monitor(listen_cmd.ListeningCommand):
