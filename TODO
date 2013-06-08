@@ -1,12 +1,12 @@
 - documentation
 - runner
-  - add exception handling for exceptions that cause the program to abend
-  - report exit code
+  - report exit code?
 - monitor
-  - record activity for review
   - color output
 - replay
   - read recorded activity log
   - web app to browse history/activy of app
 - performance
   - cache the locals values for non-native types and only send updates if the signature changes? how to indicate "the same version of foo as before"?
+- include the thread id in the events
+- add option groups to the argument parser

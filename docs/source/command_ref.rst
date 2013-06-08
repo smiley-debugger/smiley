@@ -35,6 +35,14 @@ list
 
 Show the runs previously recorded in the database.
 
+.. _command-replay:
+
+replay
+======
+
+Given a single run id, dump the data from that run in the same format
+as the ``monitor`` command.
+
 .. _command-help:
 
 help

@@ -1,13 +1,15 @@
+import linecache
 import logging
 import os
 
+from cliff import command
+
 from smiley import db
-from smiley.commands import listen_cmd
+from smiley import output
 
 
-class Record(listen_cmd.ListeningCommand):
-    """Listen for running programs and record the data to a database for
-    later use.
+class Replay(command.Command):
+    """Query the database and replay a previously captured run.
 
     """
 
@@ -16,11 +18,15 @@ class Record(listen_cmd.ListeningCommand):
     _cwd = None
 
     def get_parser(self, prog_name):
-        parser = super(Record, self).get_parser(prog_name)
+        parser = super(Replay, self).get_parser(prog_name)
         parser.add_argument(
             '--database',
             default='smiley.db',
             help='filename for the database (%(default)s)',
+        )
+        parser.add_argument(
+            'run_id',
+            help='identifier for the run',
         )
         return parser
 
@@ -52,7 +58,7 @@ class Record(listen_cmd.ListeningCommand):
             self.db.start_run(
                 run_id=msg_payload['run_id'],
                 cwd=self._cwd,
-                description=msg_payload.get('command_line', []),
+                description=command_line,
                 start_time=msg_payload.get('timestamp'),
             )
 
@@ -78,7 +84,30 @@ class Record(listen_cmd.ListeningCommand):
             )
 
     def take_action(self, parsed_args):
-        # setup the database
+        self.out = output.OutputFormatter(linecache.getline)
         self.db = db.DB(parsed_args.database)
-        # Listen...
-        return super(Record, self).take_action(parsed_args)
+
+        run_details = self.db.get_run(parsed_args.run_id)
+        self.out.start_run(
+            run_details.id,
+            run_details.cwd,
+            run_details.description,
+            run_details.start_time,
+        )
+        for t in self.db.get_trace(parsed_args.run_id):
+            self.out.trace(
+                t.run_id,
+                t.event,
+                t.func_name,
+                t.line_no,
+                t.filename,
+                t.trace_arg,
+                t.local_vars,
+                t.timestamp,
+            )
+        self.out.end_run(
+            run_details.id,
+            run_details.end_time,
+            run_details.error_message,
+            None,  # run_details.traceback,
+        )

@@ -78,7 +78,7 @@ class DBTest(testtools.TestCase):
         row = data[0]
         self.assertEqual(row['id'], '12345')
         self.assertEqual(row['cwd'], '/no/such/dir')
-        self.assertEqual(row['description'], 'command line would go here')
+        self.assertEqual(row['description'], '"command line would go here"')
         self.assertEqual(row['start_time'], 1370436103.65)
         self.assertEqual(row['end_time'], None)
         self.assertEqual(row['error_message'], None)
@@ -200,7 +200,7 @@ class QueryTest(testtools.TestCase):
         self.db.start_run(
             '12345',
             '/no/such/dir',
-            'command line would go here',
+            ['command', 'line', 'would', 'go', 'here'],
             1370436103.65,
         )
         self.local_values = {'name': ['value', 'pairs']}
@@ -227,6 +227,20 @@ class QueryTest(testtools.TestCase):
         )
 
     def test_get_runs(self):
-        runs = self.db.get_runs()
+        runs = list(self.db.get_runs())
         self.assertEqual(len(runs), 1)
-        self.assertEqual(runs[0]['id'], '12345')
+        self.assertEqual(runs[0].id, '12345')
+
+    def test_get_run(self):
+        run = self.db.get_run('12345')
+        self.assertEqual(run.id, '12345')
+        self.assertEqual(
+            run.description,
+            ['command', 'line', 'would', 'go', 'here']
+        )
+
+    def test_get_trace(self):
+        trace = list(self.db.get_trace('12345'))
+        self.assertEqual(len(trace), 2)
+        line_nos = [r.line_no for r in trace]
+        self.assertEqual(line_nos, [99, 100])

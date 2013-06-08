@@ -21,7 +21,7 @@ class List(lister.Lister):
 
     DEFAULT_COLUMNS = (
         'id', 'cwd', 'description',
-        'start_time', 'end_time',
+        'start time', 'end time',
         'error message',
     )
 
@@ -36,9 +36,10 @@ class List(lister.Lister):
 
     def take_action(self, parsed_args):
         self.db = db.DB(parsed_args.database)
-        runs = ((r['id'], r['cwd'], r['description'],
-                 _format_timestamp(r['start_time']),
-                 _format_timestamp(r['end_time']),
-                 r['error_message'])
+        runs = ((r.id, r.cwd,
+                 ' '.join(r.description),
+                 _format_timestamp(r.start_time),
+                 _format_timestamp(r.end_time),
+                 r.error_message)
                 for r in self.db.get_runs())
         return (self.DEFAULT_COLUMNS, runs)

@@ -1,4 +1,6 @@
+import collections
 import contextlib
+import json
 import logging
 import pkgutil
 import sqlite3
@@ -7,6 +9,46 @@ from smiley import jsonutil
 from smiley import processor
 
 LOG = logging.getLogger(__name__)
+
+
+Run = collections.namedtuple(
+    'Run',
+    'id cwd description start_time end_time error_message',
+)
+
+
+def _make_run(row):
+    return Run(
+        row['id'],
+        row['cwd'],
+        json.loads(row['description']),
+        row['start_time'],
+        row['end_time'],
+        row['error_message'],
+    )
+
+
+Trace = collections.namedtuple(
+    'Trace',
+    ' '.join(['id', 'run_id', 'event',
+              'filename', 'line_no', 'func_name',
+              'trace_arg', 'local_vars',
+              'timestamp'])
+)
+
+
+def _make_trace(row):
+    return Trace(
+        row['id'],
+        row['run_id'],
+        row['event'],
+        row['filename'],
+        row['line_no'],
+        row['func_name'],
+        json.loads(row['trace_arg']),
+        json.loads(row['local_vars']),
+        row['timestamp'],
+    )
 
 
 @contextlib.contextmanager
@@ -40,18 +82,6 @@ class DB(processor.EventProcessor):
             cursor.executescript(schema)
         return
 
-    def get_runs(self):
-        "Return the run data."
-        with transaction(self.conn) as c:
-            c.execute(
-                """
-                SELECT
-                  id, cwd, description, start_time, end_time, error_message
-                FROM run
-                """
-            )
-            return c.fetchall()
-
     def start_run(self, run_id, cwd, description, start_time):
         "Record the beginning of a run."
         with transaction(self.conn) as c:
@@ -62,7 +92,7 @@ class DB(processor.EventProcessor):
                 """,
                 {'id': run_id,
                  'cwd': cwd,
-                 'description': description,
+                 'description': jsonutil.dumps(description),
                  'start_time': start_time}
             )
 
@@ -113,3 +143,28 @@ class DB(processor.EventProcessor):
                  'timestamp': timestamp,
                  }
             )
+
+    def get_runs(self):
+        "Return the run data."
+        with transaction(self.conn) as c:
+            c.execute("SELECT * FROM run ORDER BY start_time",)
+            return (_make_run(r) for r in c.fetchall())
+
+    def get_run(self, run_id):
+        "Return the run data."
+        with transaction(self.conn) as c:
+            c.execute(
+                "SELECT * FROM run WHERE id = :run_id",
+                {'run_id': run_id},
+            )
+            return _make_run(c.fetchone())
+
+    def get_trace(self, run_id):
+        "Return the run data."
+        with transaction(self.conn) as c:
+            c.execute(
+                "SELECT * FROM trace WHERE run_id = :run_id ORDER BY id",
+                {'run_id': run_id},
+            )
+            return (_make_trace(t)
+                    for t in c.fetchall())
