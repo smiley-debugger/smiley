@@ -40,6 +40,18 @@ class DB(processor.EventProcessor):
             cursor.executescript(schema)
         return
 
+    def get_runs(self):
+        "Return the run data."
+        with transaction(self.conn) as c:
+            c.execute(
+                """
+                SELECT
+                  id, cwd, description, start_time, end_time, error_message
+                FROM run
+                """
+            )
+            return c.fetchall()
+
     def start_run(self, run_id, cwd, description, start_time):
         "Record the beginning of a run."
         with transaction(self.conn) as c:

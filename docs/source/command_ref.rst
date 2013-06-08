@@ -28,6 +28,13 @@ record
 Listen for trace data from an application running under the ``run``
 command and write it to a database for later analysis.
 
+.. _command-list:
+
+list
+====
+
+Show the runs previously recorded in the database.
+
 .. _command-help:
 
 help

@@ -189,3 +189,44 @@ class TraceTest(testtools.TestCase):
         row = c.fetchone()
         self.assertEqual(json.loads(row['trace_arg']),
                          self.trace_arg)
+
+
+class QueryTest(testtools.TestCase):
+
+    def setUp(self):
+        super(QueryTest, self).setUp()
+        self.useFixture(fixtures.FakeLogger())
+        self.db = db.DB(':memory:')
+        self.db.start_run(
+            '12345',
+            '/no/such/dir',
+            'command line would go here',
+            1370436103.65,
+        )
+        self.local_values = {'name': ['value', 'pairs']}
+        self.trace_arg = [{'complex': 'value'}]
+        self.db.trace(
+            run_id='12345',
+            event='test',
+            func_name='test_trace',
+            line_no=99,
+            filename='test_db.py',
+            trace_arg=self.trace_arg,
+            local_vars=self.local_values,
+            timestamp=1370436104.65,
+        )
+        self.db.trace(
+            run_id='12345',
+            event='test',
+            func_name='test_trace',
+            line_no=100,
+            filename='test_db.py',
+            trace_arg=self.trace_arg,
+            local_vars=self.local_values,
+            timestamp=1370436104.65,
+        )
+
+    def test_get_runs(self):
+        runs = self.db.get_runs()
+        self.assertEqual(len(runs), 1)
+        self.assertEqual(runs[0]['id'], '12345')

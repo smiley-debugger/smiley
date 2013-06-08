@@ -6,6 +6,7 @@ dev
 ===
 
 - Add :ref:`command-record` command.
+- Add :ref:`command-list` command.
 
 0.2
 ===
