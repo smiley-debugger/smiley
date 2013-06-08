@@ -1,4 +1,3 @@
-import linecache
 import logging
 import os
 
@@ -29,6 +28,18 @@ class Record(listen_cmd.ListeningCommand):
         msg_type, msg_payload = msg
         self.log.debug('MESSAGE: %s %r', msg_type, msg_payload)
 
+        # TODO: Make sure the file appears in our cache.
+        #       - use a simple hash signature
+        #       - assume unique for life of a "run"
+
+        # filename = msg_payload['filename']
+        # if filename.startswith(self._cwd):
+        #     filename = filename[len(self._cwd):]
+        # line = linecache.getline(
+        #     msg_payload['filename'],  # use the full name here
+        #     msg_payload['line_no'],
+        # ).rstrip()
+
         if msg_type == 'start_run':
             command_line = ' '.join(msg_payload.get('command_line', []))
             self.log.info(
@@ -55,35 +66,16 @@ class Record(listen_cmd.ListeningCommand):
             )
 
         else:
-            filename = msg_payload['filename']
-            if filename.startswith(self._cwd):
-                filename = filename[len(self._cwd):]
-            line = linecache.getline(
-                msg_payload['filename'],  # use the full name here
-                msg_payload['line_no'],
-            ).rstrip()
-            if msg_type == 'return':
-                self.log.info(
-                    '%s:%4s: return>>> %s',
-                    filename,
-                    msg_payload['line_no'],
-                    msg_payload['arg'],
-                )
-            else:
-                self.log.info(
-                    '%s:%4s: %s',
-                    filename,
-                    msg_payload['line_no'],
-                    line,
-                )
-                if msg_payload.get('locals'):
-                    for n, v in sorted(msg_payload['locals'].items()):
-                        self.log.info(
-                            '%s       %s = %s',
-                            ' ' * len(filename),
-                            n,
-                            v,
-                        )
+            self.db.trace(
+                run_id=msg_payload['run_id'],
+                event=msg_type,
+                func_name=msg_payload.get('func_name'),
+                line_no=msg_payload.get('line_no'),
+                filename=msg_payload.get('filename'),
+                trace_arg=msg_payload.get('arg'),
+                locals=msg_payload.get('locals'),
+                timestamp=msg_payload.get('timestamp'),
+            )
 
     def take_action(self, parsed_args):
         # setup the database

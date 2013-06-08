@@ -70,3 +70,33 @@ class DB(object):
                  'message': message,
                  'traceback': jsonutil.dumps(traceback)},
             )
+
+    def trace(self, run_id, event,
+              func_name, line_no, filename,
+              trace_arg, locals,
+              timestamp):
+        "Record an event during a run."
+        with transaction(self.conn) as c:
+            c.execute(
+                """
+                INSERT INTO trace
+                (run_id, event,
+                 func_name, line_no, filename,
+                 trace_arg, locals,
+                 timestamp)
+                VALUES
+                (:run_id, :event,
+                 :func_name, :line_no, :filename,
+                 :trace_arg, :locals,
+                 :timestamp)
+                """,
+                {'run_id': run_id,
+                 'event': event,
+                 'func_name': func_name,
+                 'line_no': line_no,
+                 'filename': filename,
+                 'trace_arg': jsonutil.dumps(trace_arg),
+                 'locals': jsonutil.dumps(locals),
+                 'timestamp': timestamp,
+                 }
+            )

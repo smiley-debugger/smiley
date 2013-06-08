@@ -131,3 +131,44 @@ class DBTest(testtools.TestCase):
         self.assertEqual(row['error_message'], 'test exception')
         # FIXME: Need to serialize the traceback better
         assert 'traceback' in row['traceback']
+
+
+class TraceTest(testtools.TestCase):
+
+    def setUp(self):
+        super(TraceTest, self).setUp()
+        self.useFixture(fixtures.FakeLogger())
+        self.db = db.DB(':memory:')
+        self.db.start_run(
+            '12345',
+            '/no/such/dir',
+            'command line would go here',
+            1370436103.65,
+        )
+        self.db.trace(
+            run_id='12345',
+            event='test',
+            func_name='test_trace',
+            line_no=99,
+            filename='test_db.py',
+            trace_arg=[{'complex': 'value'}],
+            locals={'name': ('value', 'pairs')},
+            timestamp=1370436104.65,
+        )
+        self.db.trace(
+            run_id='12345',
+            event='test',
+            func_name='test_trace',
+            line_no=100,
+            filename='test_db.py',
+            trace_arg=[{'complex': 'value'}],
+            locals={'name': ('value', 'pairs')},
+            timestamp=1370436104.65,
+        )
+
+    def test_insertion_order(self):
+        c = self.db.conn.cursor()
+        c.execute('select * from trace order by id')
+        data = c.fetchall()
+        line_nos = [r['line_no'] for r in data]
+        self.assertEqual(line_nos, [99, 100])
