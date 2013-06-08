@@ -61,6 +61,18 @@ class Monitor(listen_cmd.ListeningCommand):
                     msg_payload['line_no'],
                     msg_payload['arg'],
                 )
+            elif msg_type == 'exception':
+                self.log.info(
+                    '%s:%4s: Exception:',
+                    filename,
+                    msg_payload['line_no'],
+                )
+                exc_type, exc_msg, exc_tb = msg_payload['arg']
+                for exc_file, exc_line, exc_func, exc_text in exc_tb:
+                    self.log.info(
+                        '    %s:%4s: %s',
+                        exc_file, exc_line, exc_text,
+                    )
             else:
                 self.log.info(
                     '%s:%4s: %s',

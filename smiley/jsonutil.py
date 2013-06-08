@@ -1,9 +1,21 @@
 import json
+import traceback
+import types
 
 
 def _json_special_types(obj):
-    # FIXME: Special handling for tracebacks needed.
-    return repr(obj)
+    if isinstance(obj, types.TracebackType):
+        return traceback.extract_tb(obj)
+    if isinstance(obj, type):
+        # We don't want to return classes
+        return repr(obj)
+    try:
+        data = dict(vars(obj))
+        data['__class__'] = obj.__class__.__name__
+        data['__module__'] = obj.__class__.__module__
+    except Exception as err:
+        data = repr(obj)
+    return data
 
 
 def dumps(data):

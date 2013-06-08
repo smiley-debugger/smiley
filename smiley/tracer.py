@@ -127,14 +127,17 @@ class Tracer(object):
         except ExceptionDuringRun as err:
             # Unpack the wrapped exception
             err_type, orig_err, traceback = err.args
-            self.publisher.send(
-                'end_run',
-                {'run_id': self.run_id,
-                 'message': unicode(orig_err),
-                 'traceback': traceback,
-                 'timestamp': time.time(),
-                 },
-            )
+            try:
+                self.publisher.send(
+                    'end_run',
+                    {'run_id': self.run_id,
+                     'message': unicode(orig_err),
+                     'traceback': traceback,
+                     'timestamp': time.time(),
+                     },
+                )
+            finally:
+                del traceback  # remove circular reference for GC
         else:
             self.publisher.send(
                 'end_run',
