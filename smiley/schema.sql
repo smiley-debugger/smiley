@@ -28,3 +28,22 @@ create table trace (
 );
 
 create index if not exists trace_run_id_idx on trace (run_id);
+
+create table file (
+    signature text primary key not null,
+    name text,
+    body text
+);
+
+create unique index
+    if not exists file_signature_name_idx
+    on file(signature, name);
+
+create table run_file (
+    run_id text not null references run(id),
+    signature text not null references file(signature)
+);
+
+create unique index
+    if not exists run_file_id_signature_idx
+    on run_file(run_id, signature);

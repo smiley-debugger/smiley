@@ -262,3 +262,108 @@ class QueryTest(testtools.TestCase):
         self.assertEqual(len(trace), 2)
         line_nos = [r.line_no for r in trace]
         self.assertEqual(line_nos, [99, 100])
+
+
+class FileCacheTest(testtools.TestCase):
+
+    def setUp(self):
+        super(FileCacheTest, self).setUp()
+        self.useFixture(fixtures.FakeLogger())
+        self.db = db.DB(':memory:')
+        self.db.start_run(
+            '12345',
+            '/no/such/dir',
+            ['command', 'line', 'would', 'go', 'here'],
+            1370436103.65,
+        )
+        self.db.start_run(
+            '6789',
+            '/no/such/dir',
+            ['command', 'line', 'would', 'go', 'here'],
+            1370436103.65,
+        )
+
+    def test_add_file(self):
+        self.db.cache_file_for_run(
+            '12345',
+            'test-file.txt',
+            'this would be the body',
+        )
+        c = self.db.conn.cursor()
+        c.execute('select * from file')
+        rows = list(c.fetchall())
+        self.assertEqual(len(rows), 1)
+        row = rows[0]
+        self.assertEqual(row['body'], 'this would be the body')
+        self.assertEqual(row['name'], 'test-file.txt')
+
+    def test_add_file_twice_same(self):
+        self.db.cache_file_for_run(
+            '12345',
+            'test-file.txt',
+            'this would be the body',
+        )
+        self.db.cache_file_for_run(
+            '12345',
+            'test-file.txt',
+            'this would be the body',
+        )
+        c = self.db.conn.cursor()
+        c.execute('select * from file')
+        rows = list(c.fetchall())
+        self.assertEqual(len(rows), 1)
+        row = rows[0]
+        self.assertEqual(row['body'], 'this would be the body')
+        self.assertEqual(row['name'], 'test-file.txt')
+
+    def test_add_file_twice_different(self):
+        self.db.cache_file_for_run(
+            '12345',
+            'test-file.txt',
+            'this would be the body',
+        )
+        self.db.cache_file_for_run(
+            '12345',
+            'test-file.txt',
+            'this body has changed',
+        )
+        c = self.db.conn.cursor()
+        c.execute('select * from file')
+        rows = list(c.fetchall())
+        self.assertEqual(len(rows), 2)
+
+    def test_retrieve_from_run(self):
+        self.db.cache_file_for_run(
+            '12345',
+            'test-file.txt',
+            'this would be the body',
+        )
+        body = self.db.get_cached_file(
+            '12345',
+            'test-file.txt',
+        )
+        self.assertEqual(body, 'this would be the body')
+
+    def test_retrieve_from_run_bad_id(self):
+        self.db.cache_file_for_run(
+            '12345',
+            'test-file.txt',
+            'this would be the body',
+        )
+        body = self.db.get_cached_file(
+            '6789',  # wrong run id
+            'test-file.txt',
+        )
+        self.assertEqual(body, '')
+
+    def test_retrieve_from_run_bad_name(self):
+        self.db.cache_file_for_run(
+            '12345',
+            'test-file.txt',
+            'this would be the body',
+        )
+        body = self.db.get_cached_file(
+            '12345',
+            'no-such-file.txt',
+        )
+        self.assertEqual(body, '')

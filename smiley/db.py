@@ -1,5 +1,6 @@
 import collections
 import contextlib
+import hashlib
 import json
 import logging
 import pkgutil
@@ -172,3 +173,54 @@ class DB(processor.EventProcessor):
             )
             return (_make_trace(t)
                     for t in c.fetchall())
+
+    def cache_file_for_run(self, run_id, filename, body):
+        signature_maker = hashlib.sha1()
+        signature_maker.update(filename)
+        signature_maker.update(body)
+        signature = signature_maker.hexdigest()
+        with transaction(self.conn) as c:
+            try:
+                c.execute(
+                    """
+                    INSERT INTO file (signature, name, body)
+                    VALUES (:signature, :filename, :body)
+                    """,
+                    {'signature': signature,
+                     'filename': filename,
+                     'body': body,
+                     },
+                )
+            except sqlite3.IntegrityError:
+                pass
+            try:
+                c.execute(
+                    """
+                    INSERT INTO run_file
+                    (run_id, signature)
+                    VALUES (:run_id, :signature)
+                    """,
+                    {'run_id': run_id,
+                     'signature': signature,
+                     },
+                )
+            except sqlite3.IntegrityError:
+                pass
+
+    def get_cached_file(self, run_id, filename):
+        with transaction(self.conn) as c:
+            c.execute(
+                """
+                SELECT body
+                FROM file JOIN run_file USING (signature)
+                WHERE
+                  name = :filename
+                  AND
+                  run_id = :run_id
+                """,
+                {'filename': filename,
+                 'run_id': run_id,
+                 },
+            )
+            row = c.fetchone()
+            return row['body'] if row else ''
