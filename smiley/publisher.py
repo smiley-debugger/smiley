@@ -1,19 +1,11 @@
-import json
 import logging
 
 import zmq
 import sys
 
+from smiley import jsonutil
+
 LOG = logging.getLogger(__name__)
-
-
-def _json_special_types(obj):
-    # FIXME: Special handling for tracebacks needed.
-    return repr(obj)
-
-
-def _get_json(data):
-    return json.dumps(data, default=_json_special_types)
 
 
 class Publisher(object):
@@ -32,7 +24,7 @@ class Publisher(object):
             sys.settrace(None)
             msg = [
                 msg_type,
-                _get_json(data),
+                jsonutil.dumps(data),
             ]
             LOG.debug('SENDING: %r', msg)
             self.pub_socket.send_multipart(msg)

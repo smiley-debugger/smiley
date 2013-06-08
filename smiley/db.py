@@ -3,6 +3,8 @@ import logging
 import pkgutil
 import sqlite3
 
+from smiley import jsonutil
+
 LOG = logging.getLogger(__name__)
 
 
@@ -66,5 +68,5 @@ class DB(object):
                 {'id': run_id,
                  'end_time': end_time,
                  'message': message,
-                 'traceback': traceback},
+                 'traceback': jsonutil.dumps(traceback)},
             )

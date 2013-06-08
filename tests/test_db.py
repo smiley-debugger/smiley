@@ -2,7 +2,6 @@ import fixtures
 import testtools
 
 from smiley import db
-from smiley import publisher
 
 
 class TransactionTest(testtools.TestCase):
@@ -121,7 +120,7 @@ class DBTest(testtools.TestCase):
                 '12345',
                 1370436104.65,
                 message=unicode(err),
-                traceback=publisher._get_json(sys.exc_info()[-1]),
+                traceback=sys.exc_info()[-1],
             )
         c = self.db.conn.cursor()
         c.execute('select * from run')
