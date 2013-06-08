@@ -2,6 +2,11 @@
  Release History
 =================
 
+dev
+===
+
+- Add :ref:`command-record` command.
+
 0.2
 ===
 
