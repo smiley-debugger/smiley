@@ -8,7 +8,7 @@ import prettytable
 from smiley import processor
 
 
-def dump_dictionary(d, write, indent=4):
+def format_dictionary(d):
     x = prettytable.PrettyTable(field_names=('Variable', 'Value'),
                                 print_empty=False)
     x.padding_width = 1
@@ -23,12 +23,19 @@ def dump_dictionary(d, write, indent=4):
             formatted_value.splitlines())
         for name, value in pairs:
             x.add_row((name, value))
-    formatted = x.get_string(fields=('Variable', 'Value'))
+    return x.get_string(fields=('Variable', 'Value'))
+
+
+def dump_table(formatted, write, indent=0):
     # Use the write function we're given, one line at a time.
     indent_spaces = ' ' * 4
     for line in formatted.splitlines():
         write(indent_spaces + line)
     return
+
+
+def dump_dictionary(d, write, indent=4):
+    dump_table(format_dictionary(d), write, indent)
 
 
 class OutputFormatter(processor.EventProcessor):
@@ -69,9 +76,16 @@ class OutputFormatter(processor.EventProcessor):
             line_no,
         ).rstrip()
         display_filename = self._get_display_filename(filename)
-        # FIXME: Test for line events first since they are the most
-        # common.
-        if event == 'return':
+        if event in ('line', 'call'):
+            self.log.info(
+                '%s:%4s: %s',
+                display_filename,
+                line_no,
+                line,
+            )
+            if local_vars:
+                dump_dictionary(local_vars, self.log.info)
+        elif event == 'return':
             self.log.info(
                 '%s:%4s: return>>> %s',
                 display_filename,
@@ -91,11 +105,4 @@ class OutputFormatter(processor.EventProcessor):
                     self._get_display_filename(exc_file), exc_line, exc_text,
                 )
         else:
-            self.log.info(
-                '%s:%4s: %s',
-                display_filename,
-                line_no,
-                line,
-            )
-            if local_vars:
-                dump_dictionary(local_vars, self.log.info)
+            print 'UNHANDLED EVENT:', event
