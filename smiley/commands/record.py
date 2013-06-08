@@ -73,7 +73,7 @@ class Record(listen_cmd.ListeningCommand):
                 line_no=msg_payload.get('line_no'),
                 filename=msg_payload.get('filename'),
                 trace_arg=msg_payload.get('arg'),
-                locals=msg_payload.get('locals'),
+                local_vars=msg_payload.get('local_vars'),
                 timestamp=msg_payload.get('timestamp'),
             )
 

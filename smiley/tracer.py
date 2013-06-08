@@ -92,7 +92,7 @@ class Tracer(object):
              'line_no': line_no,
              'filename': filename,
              'arg': arg,
-             'locals': interesting_locals,
+             'local_vars': interesting_locals,
              'timestamp': time.time(),
              'run_id': self.run_id,
              })

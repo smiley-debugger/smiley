@@ -73,7 +73,7 @@ class DB(object):
 
     def trace(self, run_id, event,
               func_name, line_no, filename,
-              trace_arg, locals,
+              trace_arg, local_vars,
               timestamp):
         "Record an event during a run."
         with transaction(self.conn) as c:
@@ -82,12 +82,12 @@ class DB(object):
                 INSERT INTO trace
                 (run_id, event,
                  func_name, line_no, filename,
-                 trace_arg, locals,
+                 trace_arg, local_vars,
                  timestamp)
                 VALUES
                 (:run_id, :event,
                  :func_name, :line_no, :filename,
-                 :trace_arg, :locals,
+                 :trace_arg, :local_vars,
                  :timestamp)
                 """,
                 {'run_id': run_id,
@@ -96,7 +96,7 @@ class DB(object):
                  'line_no': line_no,
                  'filename': filename,
                  'trace_arg': jsonutil.dumps(trace_arg),
-                 'locals': jsonutil.dumps(locals),
+                 'local_vars': jsonutil.dumps(local_vars),
                  'timestamp': timestamp,
                  }
             )

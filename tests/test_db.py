@@ -155,7 +155,7 @@ class TraceTest(testtools.TestCase):
             line_no=99,
             filename='test_db.py',
             trace_arg=self.trace_arg,
-            locals=self.local_values,
+            local_vars=self.local_values,
             timestamp=1370436104.65,
         )
         self.db.trace(
@@ -165,7 +165,7 @@ class TraceTest(testtools.TestCase):
             line_no=100,
             filename='test_db.py',
             trace_arg=self.trace_arg,
-            locals=self.local_values,
+            local_vars=self.local_values,
             timestamp=1370436104.65,
         )
 
@@ -176,11 +176,11 @@ class TraceTest(testtools.TestCase):
         line_nos = [r['line_no'] for r in data]
         self.assertEqual(line_nos, [99, 100])
 
-    def test_locals(self):
+    def test_local_vars(self):
         c = self.db.conn.cursor()
         c.execute('select * from trace order by id')
         row = c.fetchone()
-        self.assertEqual(json.loads(row['locals']),
+        self.assertEqual(json.loads(row['local_vars']),
                          self.local_values)
 
     def test_trace_arg(self):

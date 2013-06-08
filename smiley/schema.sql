@@ -23,7 +23,7 @@ create table trace (
     line_no int,
     func_name text,
     trace_arg text,  -- the "arg" argument to the trace function, json-encoded
-    locals text,  -- json-encoded dict
+    local_vars text,  -- json-encoded dict
     timestamp int
 );
 
