@@ -144,7 +144,7 @@ class Tracer(object):
             self.publisher.end_run(
                 self.run_id,
                 time.time(),
-                error=None,
                 message=None,
+                traceback=None,
             )
             self.run_id = None
