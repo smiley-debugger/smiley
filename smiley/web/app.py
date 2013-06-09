@@ -1,5 +1,6 @@
 from pecan import make_app
 from smiley.web import model
+from smiley.web import hooks
 
 
 def setup_app(config):
@@ -17,4 +18,7 @@ def setup_app(config):
             config.app,
             'guess_content_type_from_ext',
             True),
+        hooks=[
+            hooks.DBHook(config.smiley.database_name),
+        ],
     )
