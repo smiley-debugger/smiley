@@ -3,10 +3,9 @@ from wsgiref import simple_server
 
 from cliff import command
 
-from pecan import configuration
 from pecan import load_app
 
-from smiley.web import config as config_module
+from smiley.web import config as web_config
 
 
 class Server(command.Command):
@@ -28,10 +27,7 @@ class Server(command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        config_data = dict(vars(config_module).items())
-        config_data['smiley'] = {
-            'database_name': parsed_args.database,
-        }
+        config_data = web_config.get_config_dict(parsed_args.database)
         app = load_app(config_data)
 
         # FIXME: Provide command line options to override these
