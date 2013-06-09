@@ -1,3 +1,4 @@
 cliff
 pyzmq
 coverage
+pecan
