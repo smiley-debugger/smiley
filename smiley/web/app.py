@@ -10,7 +10,7 @@ def setup_app(config):
         config.app.root,
         static_root=config.app.static_root,
         template_path=config.app.template_path,
-        logging=getattr(config, 'logging', {}),
+        logging={},  # let cliff configure logging, otherwise output repeats
         debug=getattr(config.app, 'debug', False),
         force_canonical=getattr(config.app, 'force_canonical', True),
         guess_content_type_from_ext=getattr(
