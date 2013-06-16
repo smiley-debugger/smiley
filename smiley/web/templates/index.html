@@ -6,11 +6,11 @@
 </%def>
 
 ## now define the body of the template
-    <header>
+    <div id="sidebar" class="pure-u-1-3">
         <h1><img src="/images/logo.png" /></h1>
-    </header>
+    </div>
 
-    <div id="content">
+    <div id="content" class="pure-u-2-3">
 
         <p>This is a sample Pecan project.</p>
 
@@ -23,12 +23,13 @@
             ...or you can search the documentation here:
         </p>
 
-        <form method="POST" action="/">
-            <fieldset>
-                <input name="q" />
-                <input type="submit" value="Search" />
-            <fieldset>
-            <small>Enter search terms or a module, class or function name.</small>
+        <form method="POST" action="/" class="pure-form">
+          <fieldset>
+            <legend>Search Docs</legend>
+            <input name="q" />
+            <button type="submit" class="pure-button primary-button">Search</button>
+          </fieldset>
+          <small>Enter search terms or a module, class or function name.</small>
         </form>
 
     </div>
