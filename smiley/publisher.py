@@ -57,7 +57,7 @@ class Publisher(processor.EventProcessor):
              },
         )
 
-    def trace(self, run_id, event,
+    def trace(self, run_id, call_id, event,
               func_name, line_no, filename,
               trace_arg, local_vars,
               timestamp):
@@ -72,4 +72,5 @@ class Publisher(processor.EventProcessor):
              'local_vars': local_vars,
              'timestamp': timestamp,
              'run_id': run_id,
+             'call_id': call_id,
              })

@@ -13,6 +13,7 @@ from coverage.execfile import run_python_file
 from coverage.misc import ExceptionDuringRun
 
 import smiley
+from smiley import uuidstack
 
 LOG = logging.getLogger(__name__)
 
@@ -50,6 +51,7 @@ class Tracer(object):
         # FIXME: Use a thread-local
         self.run_id = None
         self.canonical_filenames = {}
+        self.uuid_gen = uuidstack.UUIDStack()
 
     def _get_interesting_locals(self, frame):
         return {
@@ -78,7 +80,7 @@ class Tracer(object):
                 return True
         return False
 
-    def _send_notice(self, frame, event, arg):
+    def _send_notice(self, frame, event, arg, call_id):
         co = frame.f_code
         func_name = co.co_name
         line_no = frame.f_lineno
@@ -89,6 +91,7 @@ class Tracer(object):
         interesting_locals = self._get_interesting_locals(frame)
         self.publisher.trace(
             run_id=self.run_id,
+            call_id=call_id,
             event=event,
             func_name=func_name,
             line_no=line_no,
@@ -111,7 +114,13 @@ class Tracer(object):
                 filename = full
         if self._should_ignore_file(filename):
             return
-        self._send_notice(frame, event, arg)
+        if event == 'call':
+            call_id = self.uuid_gen.push()
+        elif event == 'return':
+            call_id = self.uuid_gen.pop()
+        else:
+            call_id = self.uuid_gen.top()
+        self._send_notice(frame, event, arg, call_id)
         return self.trace_calls
 
     def run(self, command_line):

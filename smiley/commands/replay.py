@@ -62,6 +62,7 @@ class Replay(command.Command):
         else:
             self.db.trace(
                 run_id=msg_payload['run_id'],
+                call_id=msg_payload['call_id'],
                 event=msg_type,
                 func_name=msg_payload.get('func_name'),
                 line_no=msg_payload.get('line_no'),

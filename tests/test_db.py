@@ -150,6 +150,7 @@ class TraceTest(testtools.TestCase):
         self.trace_arg = [{'complex': 'value'}]
         self.db.trace(
             run_id='12345',
+            call_id='abcd',
             event='test',
             func_name='test_trace',
             line_no=99,
@@ -160,6 +161,7 @@ class TraceTest(testtools.TestCase):
         )
         self.db.trace(
             run_id='12345',
+            call_id='abcd',
             event='test',
             func_name='test_trace',
             line_no=100,
@@ -207,6 +209,7 @@ class QueryTest(testtools.TestCase):
         self.trace_arg = [{'complex': 'value'}]
         self.db.trace(
             run_id='12345',
+            call_id='abcd',
             event='test',
             func_name='test_trace',
             line_no=99,
@@ -217,6 +220,7 @@ class QueryTest(testtools.TestCase):
         )
         self.db.trace(
             run_id='12345',
+            call_id='abcd',
             event='test',
             func_name='test_trace',
             line_no=100,

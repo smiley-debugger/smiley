@@ -31,7 +31,7 @@ def _make_run(row):
 
 Trace = collections.namedtuple(
     'Trace',
-    ' '.join(['id', 'run_id', 'event',
+    ' '.join(['id', 'run_id', 'call_id', 'event',
               'filename', 'line_no', 'func_name',
               'trace_arg', 'local_vars',
               'timestamp'])
@@ -42,6 +42,7 @@ def _make_trace(row):
     return Trace(
         row['id'],
         row['run_id'],
+        row['call_id'],
         row['event'],
         row['filename'],
         row['line_no'],
@@ -134,7 +135,7 @@ class DB(processor.EventProcessor):
             )
             return _make_run(c.fetchone())
 
-    def trace(self, run_id, event,
+    def trace(self, run_id, call_id, event,
               func_name, line_no, filename,
               trace_arg, local_vars,
               timestamp):
@@ -143,17 +144,18 @@ class DB(processor.EventProcessor):
             c.execute(
                 """
                 INSERT INTO trace
-                (run_id, event,
+                (run_id, call_id, event,
                  func_name, line_no, filename,
                  trace_arg, local_vars,
                  timestamp)
                 VALUES
-                (:run_id, :event,
+                (:run_id, :call_id, :event,
                  :func_name, :line_no, :filename,
                  :trace_arg, :local_vars,
                  :timestamp)
                 """,
                 {'run_id': run_id,
+                 'call_id': call_id,
                  'event': event,
                  'func_name': func_name,
                  'line_no': line_no,

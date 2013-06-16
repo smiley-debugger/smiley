@@ -15,6 +15,8 @@ create index if not exists run_id_idx on run (id);
 create table trace (
     id integer primary key autoincrement not null,
     run_id text not null references run(id),
+
+    call_id text, -- might be null for code outside a function
     
     event text not null,  -- the type of event that happened
 
