@@ -7,6 +7,8 @@ from smiley import db
 
 
 def _format_timestamp(t):
+    if t is None:
+        return ''
     return datetime.datetime.fromtimestamp(t).isoformat()
 
 
