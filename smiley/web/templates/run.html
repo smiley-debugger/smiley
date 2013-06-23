@@ -1,0 +1,54 @@
+<%inherit file="layout.html" />
+
+<%def name="filename(fn)">
+% if fn and fn.startswith(run.cwd):
+    ${fn[len(run.cwd):]}
+% else:
+    ${fn}
+% endif
+</%def>
+
+<div class="page-header">
+  <h1>Run: <small>${run_id}</small></h1>
+  <table class="table">
+    <tr><th>CWD</th><td>${run.cwd}</td></tr>
+    <tr><th>Description</th><td>${run.description}</td></tr>
+  </table>
+</div>
+
+<div class="row-fluid">
+  <div id="content" class="span12">
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Event</th>
+          <th>Filename</th>
+          <th>Line</th>
+          <th>Function</th>
+          <th>Statement</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+% for t in trace:
+        <tr>
+          <td>${t.event}</td>
+          <td>${t.filename | filename}</td>
+          <td>${t.line_no}</td>
+          <td>${t.func_name}</td>
+          <td></td>
+% if t.event == 'return':
+          <td>${t.trace_arg}</td>
+% elif not t.local_vars:
+          <td></td>
+% else:
+          <td>${t.local_vars}</td>
+% endif
+        </tr>
+% endfor        
+      </tbody>
+    </table>
+
+  </div>
+</div>

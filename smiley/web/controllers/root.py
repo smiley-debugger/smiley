@@ -27,3 +27,14 @@ class RootController(object):
     @nav.active_section('about')
     def about(self):
         return {}
+
+    @expose(generic=True, template='run.html')
+    @nav.active_section('runs')
+    def runs(self, run_id):
+        run = request.db.get_run(run_id)
+        trace = request.db.get_trace(run_id)
+        return {
+            'run_id': run_id,
+            'run': run,
+            'trace': trace,
+        }
