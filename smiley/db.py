@@ -1,5 +1,6 @@
 import collections
 import contextlib
+import datetime
 import hashlib
 import json
 import logging
@@ -23,8 +24,10 @@ def _make_run(row):
         row['id'],
         row['cwd'],
         json.loads(row['description']),
-        row['start_time'],
-        row['end_time'],
+        (datetime.datetime.fromtimestamp(row['start_time'])
+         if row['start_time'] else None),
+        (datetime.datetime.fromtimestamp(row['end_time'])
+         if row['end_time'] else None),
         row['error_message'],
     )
 
