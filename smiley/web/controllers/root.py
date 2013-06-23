@@ -6,7 +6,9 @@ class RootController(object):
 
     @expose(generic=True, template='index.html')
     def index(self):
-        return dict()
+        return {
+            'active_section': 'runs',
+        }
 
     @index.when(method='POST')
     def index_post(self, q):
@@ -23,4 +25,6 @@ class RootController(object):
 
     @expose(generic=True, template='about.html')
     def about(self):
-        return dict()
+        return {
+            'active_section': 'about',
+        }

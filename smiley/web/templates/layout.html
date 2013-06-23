@@ -1,3 +1,8 @@
+<%def name="is_active_nav(name)">
+  %if active_section == name:
+      class="active"
+  %endif
+</%def>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -15,10 +20,10 @@
       <div class="navbar-inner">
         <span class="brand">Smiley</span>
         <ul class="nav">
-          <li class="active"><a href="/">Runs</a></li>
+          <li ${is_active_nav('runs')}><a href="/">Runs</a></li>
         </ul>
         <ul class="nav pull-right">
-          <li><a href="/about">About</a></li>
+          <li ${is_active_nav('about')}><a href="/about">About</a></li>
           <li><a href="https://smiley.readthedocs.org" target="_">Help</a></li>
         </ul>
       </div>
