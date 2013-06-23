@@ -15,7 +15,7 @@ class DBLineCache(object):
             body = self._db.get_cached_file(self._run_id, filename)
             self._files[filename] = body.splitlines()
         try:
-            return self._files[filename][line_no]
+            return self._files[filename][line_no-1]
         except IndexError:
             # Line number is out of range
             return ''

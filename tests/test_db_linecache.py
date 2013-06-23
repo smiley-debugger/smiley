@@ -25,11 +25,11 @@ class DBFileCacheTest(testtools.TestCase):
         self.cache = db_linecache.DBLineCache(self.db, '12345')
 
     def test_file_and_line_exist(self):
-        line = self.cache.getline('test-file.txt', 1)
+        line = self.cache.getline('test-file.txt', 2)
         self.assertEqual(line, 'line two')
 
     def test_file_does_not_exist(self):
-        line = self.cache.getline('no-such-test-file.txt', 1)
+        line = self.cache.getline('no-such-test-file.txt', 2)
         self.assertEqual(line, '')
 
     def test_line_does_not_exist(self):
