@@ -52,7 +52,7 @@ def _make_trace(row):
         row['func_name'],
         json.loads(row['trace_arg']),
         json.loads(row['local_vars']),
-        row['timestamp'],
+        datetime.datetime.fromtimestamp(row['timestamp']),
     )
 
 
