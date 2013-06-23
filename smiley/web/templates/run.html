@@ -16,7 +16,7 @@
 % else:
   <table class="table table-hover table-condensed">
   % for n, v in sorted(vars.items()):
-    <tr><th>${n}</th><td><pre>${pformat(v, width=20)}</pre></td></tr>
+    <tr><th>${n}</th><td><pre>${pformat(v, width=20) | h}</pre></td></tr>
   % endfor
   </table>
 % endif
