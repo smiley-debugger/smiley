@@ -1,18 +1,14 @@
 from pecan import expose, redirect
 from webob.exc import status_map
 
+from smiley.web import nav
 
 class RootController(object):
 
     @expose(generic=True, template='index.html')
+    @nav.active_section('runs')
     def index(self):
-        return {
-            'active_section': 'runs',
-        }
-
-    @index.when(method='POST')
-    def index_post(self, q):
-        redirect('http://pecan.readthedocs.org/en/latest/search.html?q=%s' % q)
+        return {}
 
     @expose('error.html')
     def error(self, status):
@@ -24,7 +20,6 @@ class RootController(object):
         return dict(status=status, message=message)
 
     @expose(generic=True, template='about.html')
+    @nav.active_section('about')
     def about(self):
-        return {
-            'active_section': 'about',
-        }
+        return {}
