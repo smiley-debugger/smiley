@@ -2,6 +2,7 @@ from pecan import expose, request
 from webob.exc import status_map
 
 from smiley.web import nav
+from smiley import db_linecache
 
 
 class RootController(object):
@@ -33,8 +34,10 @@ class RootController(object):
     def runs(self, run_id):
         run = request.db.get_run(run_id)
         trace = request.db.get_trace(run_id)
+        line_cache = db_linecache.DBLineCache(request.db, run_id)
         return {
             'run_id': run_id,
             'run': run,
             'trace': trace,
+            'getline': line_cache.getline,
         }

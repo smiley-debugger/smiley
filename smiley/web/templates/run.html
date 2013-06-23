@@ -1,10 +1,24 @@
 <%inherit file="layout.html" />
 
+<%! from pprint import pformat %>
+
 <%def name="filename(fn)">
 % if fn and fn.startswith(run.cwd):
     ${fn[len(run.cwd):]}
 % else:
     ${fn}
+% endif
+</%def>
+
+<%def name="vartable(vars)">
+% if vars is None:
+  &nbsp;
+% else:
+  <table class="table table-hover table-condensed">
+  % for n, v in sorted(vars.items()):
+    <tr><th>${n}</th><td><pre>${pformat(v, width=20)}</pre></td></tr>
+  % endfor
+  </table>
 % endif
 </%def>
 
@@ -37,13 +51,15 @@
           <td>${t.filename | filename}</td>
           <td>${t.line_no}</td>
           <td>${t.func_name}</td>
-          <td></td>
+          <td><pre>${getline(t.filename, t.line_no)}</pre></td>
 % if t.event == 'return':
           <td>${t.trace_arg}</td>
+% elif t.event == 'call':
+          <td>${vartable(t.trace_arg)}</td>
 % elif not t.local_vars:
           <td></td>
 % else:
-          <td>${t.local_vars}</td>
+          <td>${vartable(t.local_vars)}</td>
 % endif
         </tr>
 % endfor        
