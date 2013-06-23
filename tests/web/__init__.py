@@ -15,7 +15,7 @@ class FunctionalTest(TestCase):
 
     def setUp(self):
         self.app = load_test_app(
-            config.get_config_dict(':memory:'),
+            config.get_config_dict(':memory:', '0.0.0.0', 9090),
         )
 
     def tearDown(self):
