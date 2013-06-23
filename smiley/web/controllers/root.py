@@ -20,3 +20,7 @@ class RootController(object):
             status = 500
         message = getattr(status_map.get(status), 'explanation', '')
         return dict(status=status, message=message)
+
+    @expose(generic=True, template='about.html')
+    def about(self):
+        return dict()
