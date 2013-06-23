@@ -211,6 +211,27 @@ class DB(processor.EventProcessor):
                 )
             except sqlite3.IntegrityError:
                 pass
+        return signature
+
+    def get_file_signature(self, run_id, filename):
+        """Return the file signature for the named file within the run.
+        """
+        with transaction(self.conn) as c:
+            c.execute(
+                """
+                SELECT signature
+                FROM file JOIN run_file USING (signature)
+                WHERE
+                  name = :filename
+                  AND
+                  run_id = :run_id
+                """,
+                {'filename': filename,
+                 'run_id': run_id,
+                 },
+            )
+            row = c.fetchone()
+            return row['signature'] if row else ''
 
     def get_cached_file(self, run_id, filename):
         with transaction(self.conn) as c:
@@ -229,3 +250,21 @@ class DB(processor.EventProcessor):
             )
             row = c.fetchone()
             return row['body'] if row else ''
+
+    def get_cached_file_by_id(self, run_id, file_id):
+        with transaction(self.conn) as c:
+            c.execute(
+                """
+                SELECT name, body
+                FROM file JOIN run_file USING (signature)
+                WHERE
+                  signature = :signature
+                  AND
+                  run_id = :run_id
+                """,
+                {'signature': file_id,
+                 'run_id': run_id,
+                 },
+            )
+            row = c.fetchone()
+            return (row['name'], row['body']) if row else ('', '')

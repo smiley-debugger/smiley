@@ -2,14 +2,6 @@
 
 <%! from pprint import pformat %>
 
-<%def name="filename(fn)">
-% if fn and fn.startswith(run.cwd):
-    ${fn[len(run.cwd):]}
-% else:
-    ${fn}
-% endif
-</%def>
-
 <%def name="vartable(vars, show_none=True)">
 % if vars is None:
 % if show_none:
@@ -25,10 +17,18 @@ ${n} = ${pformat(v, width=20) | h}
 </%def>
 
 <div class="page-header">
-  <h1>Run: <small>${run_id}</small></h1>
+  <ul class="breadcrumb">
+    <li><a href="/runs">Runs</a> <span class="divider">|</span></li>
+    <li class="active">${run_id}</li>
+  </ul>
   <table class="table">
     <tr><th>CWD</th><td>${run.cwd}</td></tr>
     <tr><th>Description</th><td>${run.description}</td></tr>
+    <tr><th>Start</th><td>${run.start_time}</td></tr>
+    <tr><th>End</th><td>${run.end_time}</td></tr>
+% if run.error_message:
+    <tr class="error"><th>Error</th><td>${run.error_message}</td></tr>
+% endif
   </table>
 </div>
 
@@ -50,7 +50,7 @@ ${n} = ${pformat(v, width=20) | h}
 % for t in trace:
         <tr>
           <td>${t.event}</td>
-          <td>${t.filename | filename}</td>
+          <td><a href="/runs/${run_id}/files/${getfileid(filename=t.filename)}">${t.filename|self.display_filename}</a></td>
           <td>${t.line_no}</td>
           <td>${t.func_name}</td>
           <td><pre>${getline(t.filename, t.line_no)}</pre></td>

@@ -342,7 +342,7 @@ class FileCacheTest(testtools.TestCase):
         rows = list(c.fetchall())
         self.assertEqual(len(rows), 2)
 
-    def test_retrieve_from_run(self):
+    def test_retrieve_via_name(self):
         self.db.cache_file_for_run(
             '12345',
             'test-file.txt',
@@ -353,6 +353,31 @@ class FileCacheTest(testtools.TestCase):
             'test-file.txt',
         )
         self.assertEqual(body, 'this would be the body')
+
+    def test_retrieve_via_signature(self):
+        signature = self.db.cache_file_for_run(
+            '12345',
+            'test-file.txt',
+            'this would be the body',
+        )
+        name, body = self.db.get_cached_file_by_id(
+            '12345',
+            signature,
+        )
+        self.assertEqual(name, 'test-file.txt')
+        self.assertEqual(body, 'this would be the body')
+
+    def test_retrieve_signature(self):
+        signature = self.db.cache_file_for_run(
+            '12345',
+            'test-file.txt',
+            'this would be the body',
+        )
+        actual = self.db.get_file_signature(
+            '12345',
+            'test-file.txt',
+        )
+        self.assertEqual(signature, actual)
 
     def test_retrieve_from_run_bad_id(self):
         self.db.cache_file_for_run(

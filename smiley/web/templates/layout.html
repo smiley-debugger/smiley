@@ -43,3 +43,12 @@
 
 <%def name="javascript()">
 </%def>
+
+<!-- Render a filename in a shorter form -->
+<%def name="display_filename(fn)">
+% if fn and fn.startswith(run.cwd):
+    ${fn[len(run.cwd):]}
+% else:
+    ${fn}
+% endif
+</%def>
