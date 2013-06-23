@@ -1,8 +1,38 @@
 <%inherit file="layout.html" />
 
 <div class="row-fluid">
-  <div id="sidebar" class="span2">
-  </div>
-  <div id="content" class="span10">
+  <div id="content" class="span12">
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Description</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+          <th>Error Message</th>
+        </tr>
+      </thead>
+      <tbody>
+% for run in runs:
+% if run.error_message:
+        <tr class="error">
+% else:
+        <tr>
+% endif
+          <td>${run.id}</td>
+          <td>${run.description}</td>
+          <td>${run.start_time}</td>
+          <td>${run.end_time}</td>
+% if run.error_message:
+          <td>${run.error_message}</td>
+% else:
+          <td></td>
+% endif
+        </tr>
+% endfor        
+      </tbody>
+    </table>
+
   </div>
 </div>

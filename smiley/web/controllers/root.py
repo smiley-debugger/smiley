@@ -1,14 +1,18 @@
-from pecan import expose, redirect
+from pecan import expose, request
 from webob.exc import status_map
 
 from smiley.web import nav
+
 
 class RootController(object):
 
     @expose(generic=True, template='index.html')
     @nav.active_section('runs')
     def index(self):
-        return {}
+        # TODO: Add option to only show error runs
+        return {
+            'runs': request.db.get_runs(sort_order='DESC'),
+        }
 
     @expose('error.html')
     def error(self, status):
