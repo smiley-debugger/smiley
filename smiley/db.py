@@ -119,12 +119,12 @@ class DB(processor.EventProcessor):
                  'traceback': jsonutil.dumps(traceback)},
             )
 
-    def get_runs(self, only_errors=False):
+    def get_runs(self, only_errors=False, sort_order='ASC'):
         "Return the run data."
         query = ["SELECT * FROM run"]
         if only_errors:
             query.append("WHERE error_message is not null")
-        query.append("ORDER BY start_time")
+        query.append("ORDER BY start_time %s" % sort_order)
         with transaction(self.conn) as c:
             c.execute(' '.join(query))
             return (_make_run(r) for r in c.fetchall())
