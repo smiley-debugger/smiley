@@ -10,15 +10,17 @@
 % endif
 </%def>
 
-<%def name="vartable(vars)">
+<%def name="vartable(vars, show_none=True)">
 % if vars is None:
-  &nbsp;
+% if show_none:
+<pre>None</pre>
+% endif
 % else:
-  <table class="table table-hover table-condensed">
-  % for n, v in sorted(vars.items()):
-    <tr><th>${n}</th><td><pre>${pformat(v, width=20) | h}</pre></td></tr>
-  % endfor
-  </table>
+<pre>
+% for n, v in sorted(vars.items()):
+${n} = ${pformat(v, width=20) | h}
+% endfor
+</pre>
 % endif
 </%def>
 
@@ -33,7 +35,7 @@
 <div class="row-fluid">
   <div id="content" class="span12">
 
-    <table class="table table-striped">
+    <table class="table table-striped table-condensed">
       <thead>
         <tr>
           <th>Event</th>
@@ -53,9 +55,9 @@
           <td>${t.func_name}</td>
           <td><pre>${getline(t.filename, t.line_no)}</pre></td>
 % if t.event == 'return':
-          <td>${t.trace_arg}</td>
+          <td><pre>${pformat(t.trace_arg, width=20)}</pre></td>
 % elif t.event == 'call':
-          <td>${vartable(t.trace_arg)}</td>
+          <td>${vartable(t.trace_arg, show_none=False)}</td>
 % elif not t.local_vars:
           <td></td>
 % else:
