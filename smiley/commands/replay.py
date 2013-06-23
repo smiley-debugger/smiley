@@ -1,5 +1,4 @@
 import logging
-import os
 
 from cliff import command
 
