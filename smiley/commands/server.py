@@ -24,13 +24,27 @@ class Server(command.Command):
             default='smiley.db',
             help='filename for the database (%(default)s)',
         )
+        parser.add_argument(
+            '--host',
+            default='0.0.0.0',
+            help='IP on which to listen (%(default)s)',
+        )
+        parser.add_argument(
+            '--port',
+            default=8080,
+            type=int,
+            help='port on which to listen (%(default)s)',
+        )
         return parser
 
     def take_action(self, parsed_args):
-        config_data = web_config.get_config_dict(parsed_args.database)
+        config_data = web_config.get_config_dict(
+            database_name=parsed_args.database,
+            host=parsed_args.host,
+            port=parsed_args.port,
+        )
         app = load_app(config_data)
 
-        # FIXME: Provide command line options to override these
         host = config_data['server']['host']
         port = int(config_data['server']['port'])
         srv = simple_server.make_server(host, port, app)

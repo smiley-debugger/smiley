@@ -5,13 +5,13 @@ from smiley import web
 _web_pkg_dir = os.path.dirname(web.__file__)
 
 
-def get_config_dict(database_name):
+def get_config_dict(database_name, host, port):
     return {
 
         # Server Specific Configurations
         'server': {
-            'port': '8080',
-            'host': '0.0.0.0'
+            'port': port,
+            'host': host,
         },
 
         # Pecan Application Configurations
