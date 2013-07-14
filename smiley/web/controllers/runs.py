@@ -5,7 +5,7 @@ from pecan.rest import RestController
 
 from smiley.web import nav
 from smiley.web.controllers import files
-from smiley import db_linecache
+from smiley.web import syntax
 
 
 class RunController(RestController):
@@ -25,7 +25,7 @@ class RunController(RestController):
     def get_one(self, run_id):
         run = request.db.get_run(run_id)
         trace = request.db.get_trace(run_id)
-        line_cache = db_linecache.DBLineCache(request.db, run_id)
+        line_cache = syntax.StyledLineCache(request.db, run_id)
         return {
             'run_id': run_id,
             'run': run,

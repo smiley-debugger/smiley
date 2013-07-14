@@ -1,11 +1,8 @@
 from pecan import expose, request
 from pecan.rest import RestController
 
-from pygments import highlight
-from pygments.formatters import HtmlFormatter
-from pygments.lexers import guess_lexer_for_filename
-
 from smiley.web import nav
+from smiley.web import syntax
 
 
 class FileController(RestController):
@@ -16,9 +13,7 @@ class FileController(RestController):
         filename, body = request.db.get_cached_file_by_id(run_id, file_id)
         run = request.db.get_run(run_id)
 
-        lexer = guess_lexer_for_filename(filename, body)
-        formatter = HtmlFormatter(linenos=True)
-        styled_body = highlight(body, lexer, formatter)
+        styled_body = syntax.apply_style(filename, body)
 
         return {
             'run_id': run_id,

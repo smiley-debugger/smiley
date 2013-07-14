@@ -53,7 +53,7 @@ ${n} = ${pformat(v, width=20) | h}
           <td><a href="/runs/${run_id}/files/${getfileid(filename=t.filename)}">${t.filename|self.display_filename}</a></td>
           <td>${t.line_no}</td>
           <td>${t.func_name}</td>
-          <td><pre>${getline(t.filename, t.line_no)}</pre></td>
+          <td><div class="highlight"><pre>${getline(t.filename, t.line_no)}</pre></div></td>
 % if t.event == 'return':
           <td><pre>${pformat(t.trace_arg, width=20)}</pre></td>
 % elif t.event == 'call':
@@ -70,3 +70,8 @@ ${n} = ${pformat(v, width=20) | h}
 
   </div>
 </div>
+
+
+<%def name="style()">
+    <link href="/css/pygments.css" rel="stylesheet">
+</%def>
