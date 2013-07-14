@@ -10,6 +10,10 @@
 
 <div class="row-fluid">
   <div id="content" class="span12">
-    <pre>${body}</pre>
+    ${styled_body}
   </div>
 </div>
+
+<%def name="style()">
+    <link href="/css/pygments.css" rel="stylesheet">
+</%def>
