@@ -7,6 +7,9 @@ dev
 
 - Add :ref:`command-record` command.
 - Add :ref:`command-list` command.
+- Add web ui and :ref:`command-server` command
+- Add mode option to :ref:`command-run` to allow writing results
+  directly to a database file.
 
 0.2
 ===

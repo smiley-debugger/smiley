@@ -43,6 +43,14 @@ replay
 Given a single run id, dump the data from that run in the same format
 as the ``monitor`` command.
 
+.. _command-server:
+
+server
+======
+
+Run a web server for browsing the pre-recorded run data collected
+by the ``record`` command.
+
 .. _command-help:
 
 help
