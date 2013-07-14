@@ -1,5 +1,5 @@
 ===========================================
- Smiley 0.2.0 -- Python Application Tracer
+ Smiley 0.3.0 -- Python Application Tracer
 ===========================================
 
 .. tags:: smiley release python
@@ -16,10 +16,11 @@ reporting. For more details, see the documentation_.
 What's New?
 ===========
 
-1. Use the script runner code from coverage_ instead of reinventing it.
-2. Documentation_ uploaded to readthedocs.org.
-
-.. _coverage: https://pypi.python.org/pypi/coverage
+- Add ``record`` command.
+- Add ``list`` command.
+- Add web ui and ``server`` command
+- Add mode option to ``run`` to allow writing results
+  directly to a database file.
 
 .. _smiley: https://github.com/dhellmann/smiley
 
