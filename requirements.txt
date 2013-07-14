@@ -2,3 +2,4 @@ cliff
 pyzmq
 coverage
 pecan
+pygments
