@@ -1,5 +1,6 @@
 import collections
 import contextlib
+import datetime
 import hashlib
 import json
 import logging
@@ -23,8 +24,10 @@ def _make_run(row):
         row['id'],
         row['cwd'],
         json.loads(row['description']),
-        row['start_time'],
-        row['end_time'],
+        (datetime.datetime.fromtimestamp(row['start_time'])
+         if row['start_time'] else None),
+        (datetime.datetime.fromtimestamp(row['end_time'])
+         if row['end_time'] else None),
         row['error_message'],
     )
 
@@ -49,7 +52,7 @@ def _make_trace(row):
         row['func_name'],
         json.loads(row['trace_arg']),
         json.loads(row['local_vars']),
-        row['timestamp'],
+        datetime.datetime.fromtimestamp(row['timestamp']),
     )
 
 
@@ -116,12 +119,12 @@ class DB(processor.EventProcessor):
                  'traceback': jsonutil.dumps(traceback)},
             )
 
-    def get_runs(self, only_errors=False):
+    def get_runs(self, only_errors=False, sort_order='ASC'):
         "Return the run data."
         query = ["SELECT * FROM run"]
         if only_errors:
             query.append("WHERE error_message is not null")
-        query.append("ORDER BY start_time")
+        query.append("ORDER BY start_time %s" % sort_order)
         with transaction(self.conn) as c:
             c.execute(' '.join(query))
             return (_make_run(r) for r in c.fetchall())
@@ -208,6 +211,27 @@ class DB(processor.EventProcessor):
                 )
             except sqlite3.IntegrityError:
                 pass
+        return signature
+
+    def get_file_signature(self, run_id, filename):
+        """Return the file signature for the named file within the run.
+        """
+        with transaction(self.conn) as c:
+            c.execute(
+                """
+                SELECT signature
+                FROM file JOIN run_file USING (signature)
+                WHERE
+                  name = :filename
+                  AND
+                  run_id = :run_id
+                """,
+                {'filename': filename,
+                 'run_id': run_id,
+                 },
+            )
+            row = c.fetchone()
+            return row['signature'] if row else ''
 
     def get_cached_file(self, run_id, filename):
         with transaction(self.conn) as c:
@@ -226,3 +250,21 @@ class DB(processor.EventProcessor):
             )
             row = c.fetchone()
             return row['body'] if row else ''
+
+    def get_cached_file_by_id(self, run_id, file_id):
+        with transaction(self.conn) as c:
+            c.execute(
+                """
+                SELECT name, body
+                FROM file JOIN run_file USING (signature)
+                WHERE
+                  signature = :signature
+                  AND
+                  run_id = :run_id
+                """,
+                {'signature': file_id,
+                 'run_id': run_id,
+                 },
+            )
+            row = c.fetchone()
+            return (row['name'], row['body']) if row else ('', '')

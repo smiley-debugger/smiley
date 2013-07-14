@@ -32,6 +32,7 @@ def large_data_structure():
     big_data = {
         'key': {
             'nested_key': 'nested_value',
+            'html_data': '<b>this text is an html snippet</b>',
             'further': {
                 'deeper': [
                     'lots of values',
