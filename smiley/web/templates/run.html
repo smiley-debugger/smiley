@@ -1,18 +1,17 @@
 <%inherit file="layout.html" />
 
 <%! from pprint import pformat %>
+<%! from smiley.web.syntax import syntax %>
 
-<%def name="vartable(vars, show_none=True)">
+<%def name="vartable(vars, show_none=True)" filter="syntax">
 % if vars is None:
 % if show_none:
-<pre>None</pre>
+None
 % endif
 % else:
-<pre>
 % for n, v in sorted(vars.items()):
-${n} = ${pformat(v, width=20) | h}
+${n} = ${pformat(v, width=20)}
 % endfor
-</pre>
 % endif
 </%def>
 
@@ -55,7 +54,7 @@ ${n} = ${pformat(v, width=20) | h}
           <td>${t.func_name}</td>
           <td><div class="highlight"><pre>${getline(t.filename, t.line_no)}</pre></div></td>
 % if t.event == 'return':
-          <td><pre>${pformat(t.trace_arg, width=20)}</pre></td>
+          <td>${pformat(t.trace_arg, width=20) | syntax}</td>
 % elif t.event == 'call':
           <td>${vartable(t.trace_arg, show_none=False)}</td>
 % elif not t.local_vars:

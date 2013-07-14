@@ -15,6 +15,11 @@ def apply_style(filename, body, linenos=True, theme='default'):
     return highlight(body, lexer, formatter)
 
 
+def syntax(body):
+    """Filter for applying syntax highlighting to blocks from templates."""
+    return apply_style('unknown.py', body, linenos=False)
+
+
 class StyledLineCache(object):
 
     def __init__(self, db, run_id):
