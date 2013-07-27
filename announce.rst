@@ -1,5 +1,5 @@
 ===========================================
- Smiley 0.3.0 -- Python Application Tracer
+ Smiley 0.4.0 -- Python Application Tracer
 ===========================================
 
 .. tags:: smiley release python
@@ -16,11 +16,9 @@ reporting. For more details, see the documentation_.
 What's New?
 ===========
 
-- Add ``record`` command.
-- Add ``list`` command.
-- Add web ui and ``server`` command
-- Add mode option to ``run`` to allow writing results
-  directly to a database file.
+- Collect profiling data along with the trace data.
+- Add ``stats show`` command.
+- Add ``stats export`` command.
 
 .. _smiley: https://github.com/dhellmann/smiley
 

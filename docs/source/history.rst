@@ -2,7 +2,7 @@
  Release History
 =================
 
-dev
+0.4
 ===
 
 - Collect profiling data along with the trace data.
