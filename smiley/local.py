@@ -1,6 +1,5 @@
 import logging
 import os
-import sys
 
 from smiley import db
 from smiley import processor

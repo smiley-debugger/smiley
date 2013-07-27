@@ -1,5 +1,4 @@
 import logging
-import os
 
 from smiley import local
 from smiley.commands import listen_cmd
