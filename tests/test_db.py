@@ -96,6 +96,7 @@ class DBTest(testtools.TestCase):
             1370436104.65,
             message=None,
             traceback=None,
+            stats=None,
         )
         c = self.db.conn.cursor()
         c.execute('select * from run')
@@ -122,6 +123,7 @@ class DBTest(testtools.TestCase):
                 1370436104.65,
                 message=unicode(err),
                 traceback=sys.exc_info()[-1],
+                stats=None,
             )
         c = self.db.conn.cursor()
         c.execute('select * from run')
@@ -240,6 +242,7 @@ class QueryTest(testtools.TestCase):
             1370436105.65,
             'error message',
             None,
+            stats=None,
         )
 
     def test_get_runs(self):

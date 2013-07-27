@@ -62,7 +62,7 @@ class OutputFormatter(processor.EventProcessor):
         if self._cwd:
             self._cwd = self._cwd.rstrip(os.sep) + os.sep
 
-    def end_run(self, run_id, end_time, message, traceback):
+    def end_run(self, run_id, end_time, message, traceback, stats):
         self.log.info('Finished run')
         if message:
             self.log.info('ERROR in app: %s', message)

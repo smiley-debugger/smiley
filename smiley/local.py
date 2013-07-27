@@ -25,10 +25,10 @@ class LocalPublisher(processor.EventProcessor):
             self._cwd = self._cwd.rstrip(os.sep) + os.sep
         self.db.start_run(run_id, cwd, description, start_time)
 
-    def end_run(self, run_id, end_time, message, traceback):
+    def end_run(self, run_id, end_time, message, traceback, stats):
         """Called when an 'end_run' event is seen.
         """
-        self.db.end_run(run_id, end_time, message, traceback)
+        self.db.end_run(run_id, end_time, message, traceback, stats)
 
     def trace(self, run_id, call_id, event,
               func_name, line_no, filename,

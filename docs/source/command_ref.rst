@@ -51,6 +51,20 @@ server
 Run a web server for browsing the pre-recorded run data collected
 by the ``record`` command.
 
+.. _command-stats-show:
+
+stats show
+==========
+
+Show the profiling data from a run.
+
+.. _command-stats-export:
+
+stats export
+============
+
+Dump the profiling data from a run to a local file.
+
 .. _command-help:
 
 help

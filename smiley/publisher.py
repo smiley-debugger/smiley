@@ -45,7 +45,7 @@ class Publisher(processor.EventProcessor):
              },
         )
 
-    def end_run(self, run_id, end_time, message, traceback):
+    def end_run(self, run_id, end_time, message, traceback, stats):
         """Called when an 'end_run' event is seen.
         """
         self._send(
@@ -54,6 +54,7 @@ class Publisher(processor.EventProcessor):
              'timestamp': end_time,
              'message': message,
              'traceback': traceback,
+             'stats': stats,
              },
         )
 

@@ -5,12 +5,14 @@ from pecan.rest import RestController
 
 from smiley.web import nav
 from smiley.web.controllers import files
+from smiley.web.controllers import stats
 from smiley.web import syntax
 
 
 class RunController(RestController):
 
     files = files.FileController()
+    stats = stats.StatsController()
 
     @expose(generic=True, template='runs.html')
     @nav.active_section('runs')

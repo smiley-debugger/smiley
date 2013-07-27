@@ -7,7 +7,10 @@ create table run (
 
     -- error handling
     error_message text,
-    traceback text
+    traceback text,
+
+    -- performance data
+    stats text
 );
 
 create index if not exists run_id_idx on run (id);

@@ -1,0 +1,7 @@
+table.stats-table td {
+	text-align: right;
+}
+
+table.stats-table td.text {
+	text-align: left;
+}

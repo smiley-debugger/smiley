@@ -15,7 +15,7 @@ class EventProcessor(object):
         """
 
     @abc.abstractmethod
-    def end_run(self, run_id, end_time, message, traceback):
+    def end_run(self, run_id, end_time, message, traceback, stats):
         """Called when an 'end_run' event is seen.
         """
 

@@ -34,7 +34,7 @@ class StyledLineCache(object):
     EXPECTED_SUFFIX = '</pre></div>'
 
     def getline(self, filename, line_no):
-        LOG.debug('getline(%s, %s)', filename, line_no)
+        #LOG.debug('getline(%s, %s)', filename, line_no)
         if filename not in self._files:
             body = self._db.get_cached_file(self._run_id, filename)
             styled_body = apply_style(filename, body, linenos=False)

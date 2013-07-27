@@ -1,10 +1,14 @@
 import atexit
+import cProfile
 import inspect
 import logging
+import marshal
 import os
+import pstats
 import random
 import socket
 import sys
+import tempfile
 import time
 import uuid
 
@@ -35,13 +39,25 @@ class TracerContext(object):
 
     def __init__(self, tracer):
         self.tracer = tracer
+        self.profile = cProfile.Profile()
 
     def __enter__(self):
+        self.profile.enable()
         sys.settrace(self.tracer.trace_calls)
         return self
 
     def __exit__(self, *args):
         sys.settrace(None)
+        self.profile.disable()
+
+    def get_stats_data(self):
+        stats = pstats.Stats(self.profile)
+        #stats.print_stats()
+        with tempfile.TemporaryFile(mode='r+') as f:
+            marshal.dump(stats.stats, f)
+            f.flush()
+            f.seek(0)
+            return f.read()
 
 
 class Tracer(object):
@@ -125,8 +141,9 @@ class Tracer(object):
 
     def run(self, command_line):
         self.run_id = str(uuid.uuid4())
+        context = TracerContext(self)
         try:
-            with TracerContext(self):
+            with context:
                 self.publisher.start_run(
                     self.run_id,
                     os.getcwd(),
@@ -146,6 +163,7 @@ class Tracer(object):
                     end_time=time.time(),
                     message=unicode(orig_err),
                     traceback=traceback,
+                    stats=context.get_stats_data(),
                 )
             finally:
                 del traceback  # remove circular reference for GC
@@ -155,5 +173,6 @@ class Tracer(object):
                 time.time(),
                 message=None,
                 traceback=None,
+                stats=context.get_stats_data(),
             )
             self.run_id = None

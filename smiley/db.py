@@ -1,3 +1,4 @@
+import base64
 import collections
 import contextlib
 import datetime
@@ -5,7 +6,9 @@ import hashlib
 import json
 import logging
 import pkgutil
+import pstats
 import sqlite3
+import tempfile
 
 from smiley import jsonutil
 from smiley import processor
@@ -15,11 +18,20 @@ LOG = logging.getLogger(__name__)
 
 Run = collections.namedtuple(
     'Run',
-    'id cwd description start_time end_time error_message',
+    'id cwd description start_time end_time error_message stats',
 )
 
 
 def _make_run(row):
+    # HACK: It really is too bad that pstats can't load data from
+    # a string.
+    if row['stats']:
+        with tempfile.NamedTemporaryFile(mode='w') as f:
+            f.write(base64.b64decode(row['stats']))
+            f.flush()
+            stats = pstats.Stats(f.name)
+    else:
+        stats = None
     return Run(
         row['id'],
         row['cwd'],
@@ -29,6 +41,7 @@ def _make_run(row):
         (datetime.datetime.fromtimestamp(row['end_time'])
          if row['end_time'] else None),
         row['error_message'],
+        stats,
     )
 
 
@@ -115,7 +128,7 @@ class DB(processor.EventProcessor):
                  'start_time': start_time}
             )
 
-    def end_run(self, run_id, end_time, message, traceback):
+    def end_run(self, run_id, end_time, message, traceback, stats):
         "Record the end of a run."
         with transaction(self.conn) as c:
             c.execute(
@@ -124,13 +137,15 @@ class DB(processor.EventProcessor):
                 SET
                     end_time = :end_time,
                     error_message = :message,
-                    traceback = :traceback
+                    traceback = :traceback,
+                    stats = :stats
                 WHERE id = :id
                 """,
                 {'id': run_id,
                  'end_time': end_time,
                  'message': message,
-                 'traceback': jsonutil.dumps(traceback)},
+                 'traceback': jsonutil.dumps(traceback),
+                 'stats': base64.b64encode(stats) if stats else None},
             )
 
     def get_runs(self, only_errors=False, sort_order='ASC'):
@@ -157,7 +172,7 @@ class DB(processor.EventProcessor):
               trace_arg, local_vars,
               timestamp):
         "Record an event during a run."
-        LOG.debug('trace(filename=%s)', filename)
+        #LOG.debug('trace(filename=%s)', filename)
         with transaction(self.conn) as c:
             c.execute(
                 """
@@ -231,7 +246,7 @@ class DB(processor.EventProcessor):
     def get_file_signature(self, run_id, filename):
         """Return the file signature for the named file within the run.
         """
-        LOG.debug('get_file_signature(%s)', filename)
+        #LOG.debug('get_file_signature(%s)', filename)
         with transaction(self.conn) as c:
             c.execute(
                 """
@@ -247,7 +262,7 @@ class DB(processor.EventProcessor):
                  },
             )
             row = c.fetchone()
-            LOG.debug(' -> %s', row)
+            #LOG.debug(' -> %s', row)
             return row['signature'] if row else ''
 
     def get_files_for_run(self, run_id):

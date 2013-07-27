@@ -2,6 +2,13 @@
  Release History
 =================
 
+dev
+===
+
+- Collect profiling data along with the trace data.
+- Add :ref:`command-stats-show` command.
+- Add :ref:`command-stats-export` command.
+
 0.3
 ===
 
