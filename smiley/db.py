@@ -32,6 +32,20 @@ def _make_run(row):
     )
 
 
+File = collections.namedtuple(
+    'File',
+    'name signature run_id',
+)
+
+
+def _make_file(row):
+    return File(
+        row['name'],
+        row['signature'],
+        row['run_id'],
+    )
+
+
 Trace = collections.namedtuple(
     'Trace',
     ' '.join(['id', 'run_id', 'call_id', 'event',
@@ -143,6 +157,7 @@ class DB(processor.EventProcessor):
               trace_arg, local_vars,
               timestamp):
         "Record an event during a run."
+        LOG.debug('trace(filename=%s)', filename)
         with transaction(self.conn) as c:
             c.execute(
                 """
@@ -216,6 +231,7 @@ class DB(processor.EventProcessor):
     def get_file_signature(self, run_id, filename):
         """Return the file signature for the named file within the run.
         """
+        LOG.debug('get_file_signature(%s)', filename)
         with transaction(self.conn) as c:
             c.execute(
                 """
@@ -231,7 +247,23 @@ class DB(processor.EventProcessor):
                  },
             )
             row = c.fetchone()
+            LOG.debug(' -> %s', row)
             return row['signature'] if row else ''
+
+    def get_files_for_run(self, run_id):
+        with transaction(self.conn) as c:
+            c.execute(
+                """
+                SELECT name, signature, run_id
+                FROM file JOIN run_file USING (signature)
+                WHERE
+                  run_id = :run_id
+                ORDER BY name ASC
+                """,
+                {'run_id': run_id,
+                 },
+            )
+            return (_make_file(row) for row in c.fetchall())
 
     def get_cached_file(self, run_id, filename):
         with transaction(self.conn) as c:

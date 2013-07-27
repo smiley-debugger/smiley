@@ -22,3 +22,14 @@ class FileController(RestController):
             'body': body,
             'styled_body': styled_body,
         }
+
+    @expose(generic=True, template='files.html')
+    @nav.active_section('runs')
+    def get_all(self, run_id):
+        # TODO: Add option to only show error runs
+        run = request.db.get_run(run_id)
+        return {
+            'run': run,
+            'files': request.db.get_files_for_run(run_id),
+            'run_id': run_id,
+        }

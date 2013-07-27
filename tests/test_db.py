@@ -402,3 +402,19 @@ class FileCacheTest(testtools.TestCase):
             'no-such-file.txt',
         )
         self.assertEqual(body, '')
+
+    def test_list_files(self):
+        self.db.cache_file_for_run(
+            '12345',
+            'test-file.txt',
+            'this would be the body',
+        )
+        self.db.cache_file_for_run(
+            '12345',
+            'test-file2.txt',
+            'this would be the body',
+        )
+        files = list(self.db.get_files_for_run('12345'))
+        self.assertEqual(2, len(files))
+        names = [f.name for f in files]
+        self.assertEqual(['test-file.txt', 'test-file2.txt'], names)
