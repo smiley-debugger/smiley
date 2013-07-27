@@ -1,7 +1,7 @@
 import logging
 import os
 
-from smiley import db
+from smiley import local
 from smiley.commands import listen_cmd
 
 
@@ -34,11 +34,7 @@ class Record(listen_cmd.ListeningCommand):
                 'Starting new run: %s',
                 command_line,
             )
-            self._cached_files = set()
-            self._cwd = msg_payload.get('cwd', '')
-            if self._cwd:
-                self._cwd = self._cwd.rstrip(os.sep) + os.sep
-            self.db.start_run(
+            self.publisher.start_run(
                 run_id=msg_payload['run_id'],
                 cwd=self._cwd,
                 description=msg_payload.get('command_line', []),
@@ -47,7 +43,7 @@ class Record(listen_cmd.ListeningCommand):
 
         elif msg_type == 'end_run':
             self.log.info('Finished run')
-            self.db.end_run(
+            self.publisher.end_run(
                 run_id=msg_payload['run_id'],
                 end_time=msg_payload.get('timestamp'),
                 message=msg_payload.get('message'),
@@ -55,7 +51,7 @@ class Record(listen_cmd.ListeningCommand):
             )
 
         else:
-            self.db.trace(
+            self.publisher.trace(
                 run_id=msg_payload['run_id'],
                 call_id=msg_payload['call_id'],
                 event=msg_type,
@@ -67,21 +63,6 @@ class Record(listen_cmd.ListeningCommand):
                 timestamp=msg_payload.get('timestamp'),
             )
 
-        filename = msg_payload.get('filename')
-        if filename and filename not in self._cached_files:
-            # Should we be decoding the text file here?
-            with open(filename, 'rb') as f:
-                body = f.read()
-            self.db.cache_file_for_run(
-                msg_payload['run_id'],
-                msg_payload['filename'],
-                body,
-            )
-            # Track the files we have cached so we do not need to
-            # re-cache them for the same run.
-            self._cached_files.add(msg_payload['filename'])
-
     def take_action(self, parsed_args):
-        self.db = db.DB(parsed_args.database)
-        self._cached_files = set()
+        self.publisher = local.LocalPublisher(parsed_args.database)
         return super(Record, self).take_action(parsed_args)

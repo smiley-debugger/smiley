@@ -1,10 +1,13 @@
 """Wrapper around the DB to present a linecache-like interface
 for copies of files stored in the db, with pygments styles applied.
 """
+import logging
 
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import guess_lexer_for_filename
+
+LOG = logging.getLogger(__name__)
 
 
 def apply_style(filename, body, linenos=True, theme='default'):
@@ -31,6 +34,7 @@ class StyledLineCache(object):
     EXPECTED_SUFFIX = '</pre></div>'
 
     def getline(self, filename, line_no):
+        LOG.debug('getline(%s, %s)', filename, line_no)
         if filename not in self._files:
             body = self._db.get_cached_file(self._run_id, filename)
             styled_body = apply_style(filename, body, linenos=False)

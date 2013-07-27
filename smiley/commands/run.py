@@ -4,7 +4,7 @@ import sys
 
 from cliff import command
 
-from smiley import db
+from smiley import local
 from smiley import publisher
 from smiley import tracer
 
@@ -63,7 +63,7 @@ class Run(command.Command):
         if parsed_args.mode == 'remote':
             p = publisher.Publisher(parsed_args.socket)
         else:
-            p = db.DB(parsed_args.database)
+            p = local.LocalPublisher(parsed_args.database)
         t = tracer.Tracer(p)
         t.run(parsed_args.command)
         return
