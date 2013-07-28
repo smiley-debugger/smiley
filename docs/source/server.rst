@@ -96,3 +96,9 @@ time.
    :height: 1081
    :scale: 75
    :alt: The call tree from the test application
+
+.. note::
+
+   In order for this page to work, you must have the ``dot`` command
+   installed. Installing smiley should install ``gprof2dot``
+   automatically.
