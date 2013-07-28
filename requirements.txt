@@ -3,3 +3,4 @@ pyzmq
 coverage
 pecan
 pygments
+gprof2dot

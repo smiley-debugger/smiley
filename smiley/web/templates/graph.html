@@ -1,0 +1,16 @@
+<%inherit file="run_base.html" />
+
+<%block name="breadcrumbs">
+<li><a href="/runs">Runs</a> <span class="divider">|</span></li>
+<li><a href="/runs/${run_id}">${run_id}</a> <span class="divider">|</span></li>
+<li><a href="/runs/${run_id}/stats">Stats</a> <span class="divider">|</span></li>
+<li class="active">Call Graph</li>
+</%block>
+
+% if run.stats:
+<div class="row-fluid">
+  <div id="content" class="span12">
+    <img src="/runs/${run_id}/stats/graph_data" />
+  </div>
+</div>
+% endif
