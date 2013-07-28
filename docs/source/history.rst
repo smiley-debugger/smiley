@@ -6,7 +6,6 @@
 ===
 
 - Add a call graph image, built with gprof2dot_ and graphviz_.
-
 - Add :doc:`server` documentation.
 - Clean up template implementations.
 - Clean up navigation and breadcrumbs.
