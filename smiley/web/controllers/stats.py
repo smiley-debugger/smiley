@@ -12,10 +12,6 @@ LOG = logging.getLogger(__name__)
 
 class StatsController(object):
 
-    _custom_actions = {
-        'graph': ['GET'],
-    }
-
     @expose(generic=True, template='stats.html')
     @nav.active_section('runs', 'stats')
     def index(self, run_id):
