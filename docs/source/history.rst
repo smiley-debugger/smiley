@@ -2,6 +2,18 @@
  Release History
 =================
 
+0.5
+===
+
+- Add a call graph image, built with gprof2dot_ and graphviz_.
+
+- Add :doc:`server` documentation.
+- Clean up template implementations.
+- Clean up navigation and breadcrumbs.
+
+.. _gprof2dot: https://code.google.com/p/jrfonseca/wiki/Gprof2Dot
+.. _graphviz: http://www.graphviz.org/
+
 0.4
 ===
 

@@ -19,6 +19,7 @@ Contents:
 
    quickstart
    command_ref
+   server
    faq
    history
 
