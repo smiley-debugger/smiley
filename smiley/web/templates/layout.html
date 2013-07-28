@@ -31,7 +31,18 @@
     </div>
     
     <div class="container-fluid">
+
+      <div class="page-header">
+        <ul class="breadcrumb">
+          <%block name="breadcrumbs">
+          </%block>
+        </ul>
+        <%block name="page_header">
+        </%block>
+      </div>
+
         ${self.body()}
+
     </div>
   </body>
 </html>
@@ -44,8 +55,8 @@
 <%def name="javascript()">
 </%def>
 
-<!-- Render a filename in a shorter form -->
 <%def name="display_filename(fn)">
+<!-- Render a filename in a shorter form -->
 % if fn and fn.startswith(run.cwd):
     ${fn[len(run.cwd):].lstrip('/')}
 % else:

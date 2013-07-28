@@ -1,16 +1,24 @@
 import functools
+import logging
+import subprocess
+import tempfile
 
 from pecan import expose, request
-from pecan.rest import RestController
 
 from smiley.web import nav
 
+LOG = logging.getLogger(__name__)
 
-class StatsController(RestController):
+
+class StatsController(object):
+
+    _custom_actions = {
+        'graph': ['GET'],
+    }
 
     @expose(generic=True, template='stats.html')
-    @nav.active_section('runs')
-    def get_all(self, run_id):
+    @nav.active_section('runs', 'stats')
+    def index(self, run_id):
         run = request.db.get_run(run_id)
 
         def stats_data(stats):

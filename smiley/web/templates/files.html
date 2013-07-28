@@ -1,33 +1,10 @@
-<%inherit file="layout.html" />
+<%inherit file="run_base.html" />
 
-<%! from pprint import pformat %>
-
-<div class="page-header">
-  <ul class="breadcrumb">
-    <li><a href="/runs">Runs</a> <span class="divider">|</span></li>
-    <li><a href="/runs/${run_id}">${run_id}</a> <span class="divider">|</span></li>
-    <li class="active">Files</li>
-  </ul>
-  <table class="table">
-    <tr><th>CWD</th><td>${run.cwd}</td></tr>
-    <tr><th>Description</th><td>${run.description}</td></tr>
-    <tr><th>Start</th><td>${run.start_time}</td></tr>
-    <tr><th>End</th><td>${run.end_time}</td></tr>
-% if run.error_message:
-    <tr class="error"><th>Error</th><td>${run.error_message}</td></tr>
-% endif
-  </table>
-</div>
-
-<div class="row-fluid">
-  <div id="content" class="span12">
-    <ul class="nav nav-pills">
-      <li><a href="/runs/${run_id}">Details</a></li>
-      <li class="active"><a href="/runs/${run_id}/files">Files</a></li>
-      <li><a href="/runs/${run_id}/stats">Stats</a></li>
-    </ul>
-  </div>
-</div>
+<%block name="breadcrumbs">
+<li><a href="/runs">Runs</a> <span class="divider">|</span></li>
+<li><a href="/runs/${run_id}">${run_id}</a> <span class="divider">|</span></li>
+<li class="active">Files</li>
+</%block>
 
 <div class="row-fluid">
   <div id="content" class="span12">

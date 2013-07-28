@@ -23,7 +23,7 @@ class RunController(RestController):
         }
 
     @expose(generic=True, template='run.html')
-    @nav.active_section('runs')
+    @nav.active_section('runs', 'details')
     def get_one(self, run_id):
         run = request.db.get_run(run_id)
         trace = request.db.get_trace(run_id)

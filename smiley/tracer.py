@@ -28,7 +28,7 @@ LOG = logging.getLogger(__name__)
 # indication for "installed with the interpreter". In some
 # environments (virtualenv, for example), these modules may be
 # spread across a few locations. Look at all the candidate modules
-# we've imported, and take all the different ones.
+# we've imported, and take all the different directories.
 IGNORE_DIRS = set()
 for m in (smiley, coverage, atexit, os, random, socket):
     if hasattr(m, "__file__"):
@@ -52,7 +52,6 @@ class TracerContext(object):
 
     def get_stats_data(self):
         stats = pstats.Stats(self.profile)
-        #stats.print_stats()
         with tempfile.TemporaryFile(mode='r+') as f:
             marshal.dump(stats.stats, f)
             f.flush()

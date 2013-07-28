@@ -1,0 +1,34 @@
+<%inherit file="layout.html" />
+
+<%def name="is_active_subnav(name)">
+  %if active_subsection == name:
+      class="active"
+  %endif
+</%def>
+
+<%block name="breadcrumbs">
+<li><a href="/runs">Runs</a> <span class="divider">|</span></li>
+<li class="active">${run_id}</li>
+</%block>
+
+<%block name="page_header">
+<table class="table">
+  <tr><th>Working Directory</th><td>${run.cwd}</td></tr>
+  <tr><th>Description</th><td>${run.description}</td></tr>
+  <tr><th>Start</th><td>${run.start_time}</td></tr>
+  <tr><th>End</th><td>${run.end_time}</td></tr>
+% if run.error_message:
+  <tr class="error"><th>Error</th><td>${run.error_message}</td></tr>
+% endif
+</table>
+
+<div class="row-fluid">
+  <div id="content" class="span12">
+    <ul class="nav nav-pills">
+      <li ${is_active_subnav('details')}><a href="/runs/${run_id}">Details</a></li>
+      <li ${is_active_subnav('files')}><a href="/runs/${run_id}/files">Files</a></li>
+      <li ${is_active_subnav('stats')}><a href="/runs/${run_id}/stats">Stats</a></li>
+    </ul>
+  </div>
+</div>
+</%block>
