@@ -3,6 +3,6 @@
 from setuptools import setup
 
 setup(
-    setup_requires=['d2to1', 'pbr'],
-    d2to1=True,
+    setup_requires=['pbr'],
+    pbr=True,
 )
