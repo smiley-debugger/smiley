@@ -2,6 +2,7 @@
 
 <%! from pprint import pformat %>
 <%! from smiley.web.syntax import syntax %>
+<%! from smiley.web.util import get_variable_changes %>
 
 <%def name="style()">
 <link href="/css/pygments.css" rel="stylesheet">
@@ -19,6 +20,12 @@ ${n} = ${pformat(v, width=20)}
 % endif
 </%def>
 
+<%def name="varchanges(vars)" filter="syntax">
+% for n, v in vars:
+${n} = ${v}
+% endfor
+</%def>
+
 <div class="row-fluid">
   <div id="content" class="span12">
 
@@ -34,6 +41,9 @@ ${n} = ${pformat(v, width=20)}
         </tr>
       </thead>
       <tbody>
+<%
+older = {}
+%>
 % for t in trace:
         <tr>
           <td>${t.event}</td>
@@ -48,7 +58,10 @@ ${n} = ${pformat(v, width=20)}
 % elif not t.local_vars:
           <td></td>
 % else:
-          <td>${vartable(t.local_vars)}</td>
+          <td>${varchanges(get_variable_changes(older, t.local_vars))}</td>
+<%
+older = t.local_vars or {}
+%>
 % endif
         </tr>
 % endfor        
