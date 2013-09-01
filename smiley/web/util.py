@@ -24,12 +24,7 @@ def get_variable_changes(older, newer):
     s_b = _mk_seq(newer)
     matcher = difflib.SequenceMatcher(None, s_a, s_b)
 
-    print
-    print older
-    print newer
     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
         if tag in {'insert', 'replace'}:
             for i in s_b[j1:j2]:
                 yield i
-        elif tag in {'delete', 'equal'}:
-            print 'not showing:', s_a[i1:i2]
