@@ -2,6 +2,14 @@
  Release History
 =================
 
+dev
+===
+
+- Update the web view to only show changes in variables. The
+  calculation of changes is very rough, and just compares the current
+  set of variables to the previous set, which might be in a completely
+  unrelated scope.
+
 0.5
 ===
 
