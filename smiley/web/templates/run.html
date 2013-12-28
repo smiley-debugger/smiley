@@ -2,7 +2,7 @@
 
 <%! from pprint import pformat %>
 <%! from smiley.web.syntax import syntax %>
-<%! from smiley.web.util import get_variable_changes %>
+<%! from smiley.util import get_variable_changes %>
 
 <%def name="style()">
 <link href="/css/pygments.css" rel="stylesheet">
@@ -48,13 +48,18 @@ older = {}
         <tr>
           <td>${t.event}</td>
           <td><a href="/runs/${run_id}/files/${getfileid(filename=t.filename)}">${t.filename|self.display_filename}</a></td>
-          <td>${t.line_no}</td>
+% if t.line_no[0] == t.line_no[1]:
+          <td>${t.line_no[0]}</td>
+% else:
+          <td>${t.line_no[0]} - ${t.line_no[1]}</td>
+% endif
           <td>${t.func_name}</td>
-          <td><div class="highlight"><pre>${getline(t.filename, t.line_no)}</pre></div></td>
+          <td><div class="highlight"><pre>${getlines(t.filename, t.line_no)}</pre></div></td>
+
 % if t.event == 'return':
           <td>${pformat(t.trace_arg, width=20) | syntax}</td>
 % elif t.event == 'call':
-          <td>${vartable(t.trace_arg, show_none=False)}</td>
+          <td></td>
 % elif not t.local_vars:
           <td></td>
 % else:
@@ -63,6 +68,7 @@ older = {}
 older = t.local_vars or {}
 %>
 % endif
+
         </tr>
 % endfor        
       </tbody>

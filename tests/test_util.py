@@ -1,7 +1,7 @@
 import pprint
 from unittest import TestCase
 
-from smiley.web import util
+from smiley import util
 
 
 class TestGetVariableChanges(TestCase):

@@ -70,16 +70,16 @@ Trace = collections.namedtuple(
 
 def _make_trace(row):
     return Trace(
-        row['id'],
-        row['run_id'],
-        row['call_id'],
-        row['event'],
-        row['filename'],
-        row['line_no'],
-        row['func_name'],
-        json.loads(row['trace_arg']),
-        json.loads(row['local_vars']),
-        datetime.datetime.fromtimestamp(row['timestamp']),
+        id=row['id'],
+        run_id=row['run_id'],
+        call_id=row['call_id'],
+        event=row['event'],
+        filename=row['filename'],
+        line_no=row['line_no'],
+        func_name=row['func_name'],
+        trace_arg=json.loads(row['trace_arg']),
+        local_vars=json.loads(row['local_vars']),
+        timestamp=datetime.datetime.fromtimestamp(row['timestamp']),
     )
 
 
