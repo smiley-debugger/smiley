@@ -40,7 +40,7 @@ class JSONTest(testtools.TestCase):
                 self.b = 'B'
         expected = {
             '__class__': 'Foo',
-            '__module__': 'tests.test_jsonutil',
+            '__module__': 'smiley.tests.test_jsonutil',
             'a': 'A',
             'b': 'B',
         }
@@ -54,7 +54,7 @@ class JSONTest(testtools.TestCase):
                 self.b = 'B'
         expected = {
             '__class__': 'Foo',
-            '__module__': 'tests.test_jsonutil',
+            '__module__': 'smiley.tests.test_jsonutil',
             'a': 'A',
             'b': 'B',
         }
