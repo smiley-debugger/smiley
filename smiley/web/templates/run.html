@@ -22,7 +22,7 @@ ${n} = ${pformat(v, width=20)}
 
 <%def name="varchanges(vars)" filter="syntax">
 % for n, v in vars:
-${n} = ${v}
+${n} = ${pformat(v, width=20)}
 % endfor
 </%def>
 

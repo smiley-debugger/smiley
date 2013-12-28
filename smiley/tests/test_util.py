@@ -1,4 +1,3 @@
-import pprint
 from unittest import TestCase
 
 from smiley import util
@@ -23,4 +22,14 @@ class TestGetVariableChanges(TestCase):
         b = {'key': 'newvalue'}
         changes = dict(util.get_variable_changes(a, b))
         self.assertIn('key', changes)
-        self.assertEqual(pprint.pformat(b['key']), changes['key'])
+        self.assertEqual(b['key'], changes['key'])
+
+    def test_change_newkey(self):
+        a = {'key': 'value',
+             'd': {'dkey': 'dval'}}
+        b = {'key': 'value',
+             'd': {'dkey': 'dval',
+                   'dkey2': 'dval2'}}
+        changes = dict(util.get_variable_changes(a, b))
+        self.assertIn('d', changes)
+        self.assertEqual(b['d'], changes['d'])
