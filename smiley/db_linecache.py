@@ -70,5 +70,4 @@ class DBLineCache(object):
         if include_comments:
             start = self.find_comment_block_start(filename, start)
         start -= 1  # shift to zero-based index for cache contents
-        print 'LINES:', self._files[filename][start:end]
         return '\n'.join(self._files[filename][start:end])

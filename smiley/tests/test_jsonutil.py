@@ -3,6 +3,8 @@ import traceback
 import fixtures
 import testtools
 
+import six
+
 from smiley import jsonutil
 
 
@@ -26,11 +28,18 @@ class JSONTest(testtools.TestCase):
             raise RuntimeError('here')
         except RuntimeError as err:
             actual = jsonutil._json_special_types(err)
-        expected = {
-            '__class__': 'RuntimeError',
-            '__module__': 'exceptions',
-            'args': ('here',),
-        }
+        if six.PY3:
+            expected = {
+                '__class__': 'RuntimeError',
+                '__module__': 'builtins',
+                'args': ('here',),
+            }
+        else:
+            expected = {
+                '__class__': 'RuntimeError',
+                '__module__': 'exceptions',
+                'args': ('here',),
+            }
         self.assertEqual(actual, expected)
 
     def test_arbitrary_object(self):

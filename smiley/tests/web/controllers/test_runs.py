@@ -309,7 +309,6 @@ class CollapseTraceTest(testtools.TestCase):
             ),
         ]
         collapsed = list(runs.collapse_trace(trace))
-        print collapsed
         self.assertEqual(len(collapsed), 4)
         self.assertEqual(collapsed[0].local_vars,
                          {'v1': 1, 'v3': 3})

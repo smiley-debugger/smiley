@@ -10,6 +10,8 @@ import pstats
 import sqlite3
 import tempfile
 
+import six
+
 from smiley import jsonutil
 from smiley import processor
 
@@ -106,11 +108,11 @@ class DB(processor.EventProcessor):
         # Try to select some data and create the schema if we can't.
         try:
             cursor = self.conn.cursor()
-            cursor.execute('select * from run')
+            cursor.execute(u'select * from run')
             LOG.debug('database already initialized')
         except sqlite3.OperationalError:
             LOG.debug('initializing database')
-            schema = pkgutil.get_data('smiley', 'schema.sql')
+            schema = pkgutil.get_data('smiley', 'schema.sql').decode('utf-8')
             cursor.executescript(schema)
         return
 
@@ -118,7 +120,7 @@ class DB(processor.EventProcessor):
         "Record the beginning of a run."
         with transaction(self.conn) as c:
             c.execute(
-                """
+                u"""
                 INSERT INTO run (id, cwd, description, start_time)
                 VALUES (:id, :cwd, :description, :start_time)
                 """,
@@ -132,7 +134,7 @@ class DB(processor.EventProcessor):
         "Record the end of a run."
         with transaction(self.conn) as c:
             c.execute(
-                """
+                u"""
                 UPDATE run
                 SET
                     end_time = :end_time,
@@ -150,19 +152,19 @@ class DB(processor.EventProcessor):
 
     def get_runs(self, only_errors=False, sort_order='ASC'):
         "Return the run data."
-        query = ["SELECT * FROM run"]
+        query = [u"SELECT * FROM run"]
         if only_errors:
-            query.append("WHERE error_message is not null")
-        query.append("ORDER BY start_time %s" % sort_order)
+            query.append(u"WHERE error_message is not null")
+        query.append(u"ORDER BY start_time %s" % sort_order)
         with transaction(self.conn) as c:
-            c.execute(' '.join(query))
+            c.execute(u' '.join(query))
             return (_make_run(r) for r in c.fetchall())
 
     def get_run(self, run_id):
         "Return the run data."
         with transaction(self.conn) as c:
             c.execute(
-                "SELECT * FROM run WHERE id = :run_id",
+                u"SELECT * FROM run WHERE id = :run_id",
                 {'run_id': run_id},
             )
             return _make_run(c.fetchone())
@@ -175,7 +177,7 @@ class DB(processor.EventProcessor):
         #LOG.debug('trace(filename=%s)', filename)
         with transaction(self.conn) as c:
             c.execute(
-                """
+                u"""
                 INSERT INTO trace
                 (run_id, call_id, event,
                  func_name, line_no, filename,
@@ -203,7 +205,7 @@ class DB(processor.EventProcessor):
         "Return the run data."
         with transaction(self.conn) as c:
             c.execute(
-                "SELECT * FROM trace WHERE run_id = :run_id ORDER BY id",
+                u"SELECT * FROM trace WHERE run_id = :run_id ORDER BY id",
                 {'run_id': run_id},
             )
             return (_make_trace(t)
@@ -211,13 +213,19 @@ class DB(processor.EventProcessor):
 
     def cache_file_for_run(self, run_id, filename, body):
         signature_maker = hashlib.sha1()
-        signature_maker.update(filename)
-        signature_maker.update(body)
+        if isinstance(filename, six.text_type):
+            signature_maker.update(filename.encode('utf-8'))
+        else:
+            signature_maker.update(filename)
+        if isinstance(body, six.text_type):
+            signature_maker.update(body.encode('utf-8'))
+        else:
+            signature_maker.update(body)
         signature = signature_maker.hexdigest()
         with transaction(self.conn) as c:
             try:
                 c.execute(
-                    """
+                    u"""
                     INSERT INTO file (signature, name, body)
                     VALUES (:signature, :filename, :body)
                     """,
@@ -230,7 +238,7 @@ class DB(processor.EventProcessor):
                 pass
             try:
                 c.execute(
-                    """
+                    u"""
                     INSERT INTO run_file
                     (run_id, signature)
                     VALUES (:run_id, :signature)
@@ -249,7 +257,7 @@ class DB(processor.EventProcessor):
         #LOG.debug('get_file_signature(%s)', filename)
         with transaction(self.conn) as c:
             c.execute(
-                """
+                u"""
                 SELECT signature
                 FROM file JOIN run_file USING (signature)
                 WHERE
@@ -268,7 +276,7 @@ class DB(processor.EventProcessor):
     def get_files_for_run(self, run_id):
         with transaction(self.conn) as c:
             c.execute(
-                """
+                u"""
                 SELECT name, signature, run_id
                 FROM file JOIN run_file USING (signature)
                 WHERE
@@ -283,7 +291,7 @@ class DB(processor.EventProcessor):
     def get_cached_file(self, run_id, filename):
         with transaction(self.conn) as c:
             c.execute(
-                """
+                u"""
                 SELECT body
                 FROM file JOIN run_file USING (signature)
                 WHERE
@@ -301,7 +309,7 @@ class DB(processor.EventProcessor):
     def get_cached_file_by_id(self, run_id, file_id):
         with transaction(self.conn) as c:
             c.execute(
-                """
+                u"""
                 SELECT name, body
                 FROM file JOIN run_file USING (signature)
                 WHERE

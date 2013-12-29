@@ -2,6 +2,8 @@ import fixtures
 import json
 import testtools
 
+import six
+
 from smiley import db
 
 
@@ -121,7 +123,7 @@ class DBTest(testtools.TestCase):
             self.db.end_run(
                 '12345',
                 1370436104.65,
-                message=unicode(err),
+                message=six.text_type(err),
                 traceback=sys.exc_info()[-1],
                 stats=None,
             )

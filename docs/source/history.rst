@@ -17,6 +17,8 @@ dev
 - Simplify calculation of local variable changes.
 - Tighten up the run view output to allow for wider lines and reduce
   clutter.
+- Make the tests pass under python 3.3. Still not doing any live
+  testing with python3 apps, but this is a start.
 
 0.5
 ===
