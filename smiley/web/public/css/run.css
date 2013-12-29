@@ -1,0 +1,10 @@
+pre {
+	border: none;
+	background: transparent;
+	margin: 0;
+	padding: 0;
+}
+
+td.run-source {
+	padding-left: 0.5em;
+}

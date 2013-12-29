@@ -15,6 +15,8 @@ dev
 - Update the web view to show comments near the source line being
   executed as further context.
 - Simplify calculation of local variable changes.
+- Tighten up the run view output to allow for wider lines and reduce
+  clutter.
 
 0.5
 ===
