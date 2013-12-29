@@ -26,6 +26,7 @@ dev
   modules). This is enabled by default.
 - Add an option to :ref:`command-run` to include a specific package in
   the trace output by name on the command line.
+- Updated to Bootstrap 3 CSS framework.
 
 0.5
 ===
