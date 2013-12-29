@@ -41,10 +41,27 @@ class Run(command.Command):
             help='trace into standard library modules',
         )
         include_group.add_argument(
+            '--no-include-stdlib',
+            action='store_false',
+            help='trace into standard library modules (default)',
+        )
+        include_group.add_argument(
             '--include-site-packages',
             action='store_true',
-            default=False,
-            help='trace into modules from site-packages',
+            default=True,
+            help='trace into modules from site-packages (default)',
+        )
+        include_group.add_argument(
+            '--no-include-site-packages',
+            action='store_false',
+            help='skip modules from site-packages',
+        )
+        include_group.add_argument(
+            '--include-package',
+            action='append',
+            dest='include_packages',
+            default=[],
+            help='trace into a specific package',
         )
         parser.add_argument(
             '--database',
@@ -80,7 +97,8 @@ class Run(command.Command):
         t = tracer.Tracer(
             p,
             include_stdlib=parsed_args.include_stdlib,
-            include_sitepackages=parsed_args.include_site_packages,
+            include_site_packages=parsed_args.include_site_packages,
+            include_packages=parsed_args.include_packages,
         )
         t.run(parsed_args.command)
         return

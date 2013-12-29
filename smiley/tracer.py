@@ -1,5 +1,6 @@
 import atexit
 import cProfile
+import imp
 import inspect
 import logging
 import marshal
@@ -50,15 +51,16 @@ class Tracer(object):
 
     def __init__(self, publisher,
                  include_stdlib=False,
-                 include_sitepackages=False):
+                 include_site_packages=True,
+                 include_packages=[]):
         self.publisher = publisher
         # FIXME: Use a thread-local
         self.run_id = None
         self.canonical_filenames = {}
         self.uuid_gen = uuidstack.UUIDStack()
 
-        # Based on similar logic from coverage's control.py, by Ned
-        # Batchelder, et al.
+        # Build the list of paths to ignore, based on similar logic
+        # from coverage's control.py, by Ned Batchelder, et al.
         #
         # Look at where some standard modules are located. That's the
         # indication for "installed with the interpreter". In some
@@ -66,16 +68,41 @@ class Tracer(object):
         # spread across a few locations. Look at all the candidate modules
         # we've imported, and take all the different directories.
         self._ignore_dirs = set()
-        candidates = []
-        if not include_sitepackages:
-            candidates.extend([smiley, coverage])
+        # Always default to ignoring smiley and the coverage module
+        candidates = [smiley, coverage]
         if not include_stdlib:
             candidates.extend([atexit, os, random, socket])
         for m in candidates:
             if hasattr(m, "__file__"):
-                self._ignore_dirs.add(
-                    os.path.dirname(m.__file__).rstrip(os.sep) + os.sep
-                )
+                to_ignore = os.path.dirname(m.__file__).rstrip(os.sep) + os.sep
+                LOG.debug('ignoring packages under %s', to_ignore)
+                self._ignore_dirs.add(to_ignore)
+
+        # Build the list of packages we are always going to
+        # include. Since the site-packages directory is under the
+        # standard libary location, we have to handle that directory
+        # here so it is checked before the standard library location.
+        self._include_packages = set()
+        for name in include_packages:
+            try:
+                f, filename, description = imp.find_module(name)
+                if f:
+                    f.close()
+            except ImportError as e:
+                LOG.info('Could not find %r to include it: %s',
+                         name, e)
+            else:
+                to_include = os.path.dirname(filename).rstrip(os.sep) + os.sep
+                LOG.debug('including packages under %s', to_include)
+                self._include_packages.add(to_include)
+        if include_site_packages:
+            # Use a package we know we require (so it is likely to be
+            # installed) but is not smiley (which will not work in a
+            # test environment) to find the site-packages directory.
+            import cliff
+            site_packages = os.path.dirname(os.path.dirname(cliff.__file__))
+            LOG.debug('including site-packages %s', site_packages)
+            self._include_packages.add(site_packages.rstrip(os.sep) + os.sep)
 
     def _get_interesting_locals(self, frame):
         return {
@@ -99,6 +126,9 @@ class Tracer(object):
         if filename.endswith('>'):
             # builtins?
             return True
+        for d in self._include_packages:
+            if filename.startswith(d):
+                return False
         for d in self._ignore_dirs:
             if filename.startswith(d):
                 return True

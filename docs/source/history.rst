@@ -23,7 +23,9 @@ dev
   standard libary. This is disabled by default.
 - Add an option to :ref:`command-run` to include modules from the
   ``site-packages`` directory (for third-party installed
-  modules). This is disabled by default.
+  modules). This is enabled by default.
+- Add an option to :ref:`command-run` to include a specific package in
+  the trace output by name on the command line.
 
 0.5
 ===
