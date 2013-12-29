@@ -31,14 +31,16 @@
     
     <div class="container">
 
-      <div class="page-header">
-        <ol class="breadcrumb">
-          <%block name="breadcrumbs">
-          </%block>
-        </ol>
-        <%block name="page_header">
+      <%block name="page_header">
+      </%block>
+
+      <ol class="breadcrumb">
+        <%block name="breadcrumbs">
         </%block>
-      </div>
+      </ol>
+
+      <%block name="page_top">
+      </%block>
 
         ${self.body()}
 
