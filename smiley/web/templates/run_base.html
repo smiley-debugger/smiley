@@ -14,15 +14,18 @@
 <%block name="page_top">
 <div class="row">
   <div class="col-md-12">
-    <table class="table">
-      <tr><th>Working Directory</th><td>${run.cwd}</td></tr>
-      <tr><th>Description</th><td>${run.description}</td></tr>
-      <tr><th>Start</th><td>${run.start_time}</td></tr>
-      <tr><th>End</th><td>${run.end_time}</td></tr>
+    <div class="panel panel-default">
+      <div class="panel-heading">Run Details</div>
+      <table class="table">
+        <tr><th>Working Directory</th><td>${run.cwd}</td></tr>
+        <tr><th>Description</th><td>${run.description}</td></tr>
+        <tr><th>Start</th><td>${run.start_time}</td></tr>
+        <tr><th>End</th><td>${run.end_time}</td></tr>
 % if run.error_message:
-      <tr class="error"><th>Error</th><td>${run.error_message}</td></tr>
+        <tr class="error"><th>Error</th><td>${run.error_message}</td></tr>
 % endif
-    </table>
+      </table>
+    </div>
   </div>
 </div>
 
