@@ -9,6 +9,12 @@ dev
   calculation of changes is very rough, and just compares the current
   set of variables to the previous set, which might be in a completely
   unrelated scope.
+- Update the web view to show consecutive lines executed together as a
+  single block. A new block is started for each call into a function
+  or when the value of a previously-seen local variable changes.
+- Update the web view to show comments near the source line being
+  executed as further context.
+- Simplify calculation of local variable changes.
 
 0.5
 ===
