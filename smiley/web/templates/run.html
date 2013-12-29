@@ -38,12 +38,17 @@ ${n} = ${pformat(v, width=15)}
 % else:
   <li><a href="${page_link(page-1, per_page)}">&laquo;</a></li>
 % endif
-% for p in range(1, num_pages + 1):
+% for r in page_ranges:
+% for p in range(r[0], r[1]+1):
   <li
 % if p == page:
  class="active"
 % endif
 ><a href="${page_link(p, per_page)}">${p}</a></li>
+% endfor
+% if len(page_ranges) > 1 and r != page_ranges[-1]:
+    <li class="disabled"><a>...</a></li>
+% endif
 % endfor
 % if page >= num_pages:
   <li class="disabled"><a href="${page_link(num_pages, per_page)}">&raquo;</a></li>

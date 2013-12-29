@@ -316,3 +316,26 @@ class CollapseTraceTest(testtools.TestCase):
                          {'v1': 1, 'v2': 2, 'v3': 4})
         self.assertEqual(collapsed[3].local_vars,
                          {'V1': 1, 'V2': 2})
+
+
+class PaginationTest(testtools.TestCase):
+
+    def test_page_range_1(self):
+        p = runs.get_pagination_values(1, 5, 100)
+        self.assertEqual([(1, 5), (20, 20)], p['page_ranges'])
+
+    def test_page_range_2(self):
+        p = runs.get_pagination_values(2, 5, 100)
+        self.assertEqual([(1, 5), (20, 20)], p['page_ranges'])
+
+    def test_page_range_10(self):
+        p = runs.get_pagination_values(10, 5, 100)
+        self.assertEqual([(1, 1), (8, 12), (20, 20)], p['page_ranges'])
+
+    def test_page_range_19(self):
+        p = runs.get_pagination_values(19, 5, 100)
+        self.assertEqual([(1, 1), (16, 20)], p['page_ranges'])
+
+    def test_page_range_20(self):
+        p = runs.get_pagination_values(20, 5, 100)
+        self.assertEqual([(1, 1), (16, 20)], p['page_ranges'])

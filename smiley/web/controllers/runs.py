@@ -82,6 +82,48 @@ def collapse_trace(trace_iter):
         yield accumulate
 
 
+def _bounded_int(val, default, low, high):
+    try:
+        val = int(val)
+    except (TypeError, ValueError):
+        val = default
+    else:
+        val = min(val, high)
+        val = max(val, low)
+    return val
+
+
+def get_pagination_values(page, per_page, num_items):
+    per_page = _bounded_int(per_page, 20, 5, 100)
+    num_pages = int(math.ceil(num_items / (per_page * 1.0)))
+    page = _bounded_int(page, 1, 1, num_pages)
+    start = (page - 1) * per_page
+    end = start + per_page
+
+    # We don't want to show every page number, so figure out
+    # the ranges we *do* want to show.
+    page_ranges = []
+    if page <= 5:
+        page_ranges.append((1, 5))
+        page_ranges.append((num_pages, num_pages))
+    elif page >= num_pages - 5 + 1:
+        page_ranges.append((1, 1))
+        page_ranges.append((num_pages - 5 + 1, num_pages))
+    else:
+        page_ranges.append((1, 1))
+        page_ranges.append((page - 2, page + 2))
+        page_ranges.append((num_pages, num_pages))
+
+    return {
+        'page': page,
+        'per_page': per_page,
+        'num_pages': num_pages,
+        'start': start,
+        'end': end,
+        'page_ranges': page_ranges,
+    }
+
+
 class RunController(RestController):
 
     files = files.FileController()
@@ -113,37 +155,16 @@ class RunController(RestController):
             self._cached_trace = trace
         syntax_line_cache = syntax.StyledLineCache(request.db, run_id)
 
-        # PAGINATION MATH
-        try:
-            per_page = int(per_page)
-        except (TypeError, ValueError):
-            per_page = 20
-        if per_page > 100:
-            per_page = 100
-        if per_page < 5:
-            per_page = 5
-        num_pages = int(math.ceil(len(trace) / (per_page * 1.0)))
-        try:
-            page = int(page)
-        except (TypeError, ValueError):
-            page = 1
-        if page < 1:
-            page = 1
-        if page > num_pages:
-            page = num_pages
-
-        start = (page - 1) * per_page
-        end = start + per_page
+        pagination = get_pagination_values(page, per_page, len(trace))
+        start = pagination['start']
+        end = pagination['end']
 
         def getlines(filename, nums):
             start, end = nums
             return syntax_line_cache.getlines(filename, start, end,
                                               include_comments=True)
 
-        return {
-            'page': page,
-            'num_pages': num_pages,
-            'per_page': per_page,
+        context = {
             'run_id': run_id,
             'run': run,
             'trace': trace[start:end],
@@ -151,3 +172,5 @@ class RunController(RestController):
             'getfileid': functools.partial(request.db.get_file_signature,
                                            run_id=run_id),
         }
+        context.update(pagination)
+        return context
