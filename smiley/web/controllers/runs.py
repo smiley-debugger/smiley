@@ -100,7 +100,7 @@ class RunController(RestController):
 
     @expose(generic=True, template='run.html')
     @nav.active_section('runs', 'details')
-    def get_one(self, run_id, page=1):
+    def get_one(self, run_id, page=1, per_page=20):
         run = request.db.get_run(run_id)
 
         if run_id == self._cached_run_id and self._cached_trace:
@@ -114,7 +114,14 @@ class RunController(RestController):
         syntax_line_cache = syntax.StyledLineCache(request.db, run_id)
 
         # PAGINATION MATH
-        per_page = 20  # FIXME: module constant? input?
+        try:
+            per_page = int(per_page)
+        except (TypeError, ValueError):
+            per_page = 20
+        if per_page > 100:
+            per_page = 100
+        if per_page < 5:
+            per_page = 5
         num_pages = int(math.ceil(len(trace) / (per_page * 1.0)))
         try:
             page = int(page)
@@ -136,6 +143,7 @@ class RunController(RestController):
         return {
             'page': page,
             'num_pages': num_pages,
+            'per_page': per_page,
             'run_id': run_id,
             'run': run,
             'trace': trace[start:end],

@@ -22,3 +22,7 @@ td.run-source div.highlight pre {
 	max-height: 340px;
 	overflow-y: scroll;
 }
+
+div#per-page-selector {
+	margin: 20px 0;
+}
