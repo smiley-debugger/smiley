@@ -96,18 +96,17 @@ class RunController(RestController):
     def get_one(self, run_id):
         run = request.db.get_run(run_id)
         trace = collapse_trace(request.db.get_trace(run_id))
-        line_cache = syntax.StyledLineCache(request.db, run_id)
+        syntax_line_cache = syntax.StyledLineCache(request.db, run_id)
 
         def getlines(filename, nums):
-            return '\n'.join(
-                line_cache.getline(filename, l)
-                for l in range(nums[0], nums[1]+1)
-            )
+            start, end = nums
+            return syntax_line_cache.getlines(filename, start, end,
+                                              include_comments=True)
+
         return {
             'run_id': run_id,
             'run': run,
             'trace': trace,
-            'getline': line_cache.getline,
             'getlines': getlines,
             'getfileid': functools.partial(request.db.get_file_signature,
                                            run_id=run_id),

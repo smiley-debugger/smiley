@@ -4,16 +4,20 @@ import sys
 
 
 def gen(m):
+    "docstring"
     for i in xrange(m):
+        # inside the for loop
         yield i
 
 
 def c(input):
+    # comment
     print('input =', input)
     data = list(gen(input))
     print('Leaving c()', data)
 
 
+# pre-function comment
 def b(arg):
     val = arg * 5
     c(val)
@@ -22,6 +26,8 @@ def b(arg):
 
 
 def produce_error():
+    # multi-line
+    # comment
     try:
         b('invalid')
     except Exception as err:
@@ -29,6 +35,7 @@ def produce_error():
 
 
 def large_data_structure():
+    # another comment
     big_data = {
         'key': {
             'nested_key': 'nested_value',
