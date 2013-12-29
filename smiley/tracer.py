@@ -21,19 +21,6 @@ from smiley import uuidstack
 
 LOG = logging.getLogger(__name__)
 
-# Based on similar logic from coverage's control.py, by Ned
-# Batchelder, et al.
-#
-# Look at where some standard modules are located. That's the
-# indication for "installed with the interpreter". In some
-# environments (virtualenv, for example), these modules may be
-# spread across a few locations. Look at all the candidate modules
-# we've imported, and take all the different directories.
-IGNORE_DIRS = set()
-for m in (smiley, coverage, atexit, os, random, socket):
-    if hasattr(m, "__file__"):
-        IGNORE_DIRS.add(os.path.dirname(m.__file__).rstrip(os.sep) + os.sep)
-
 
 class TracerContext(object):
 
@@ -61,12 +48,34 @@ class TracerContext(object):
 
 class Tracer(object):
 
-    def __init__(self, publisher):
+    def __init__(self, publisher,
+                 include_stdlib=False,
+                 include_sitepackages=False):
         self.publisher = publisher
         # FIXME: Use a thread-local
         self.run_id = None
         self.canonical_filenames = {}
         self.uuid_gen = uuidstack.UUIDStack()
+
+        # Based on similar logic from coverage's control.py, by Ned
+        # Batchelder, et al.
+        #
+        # Look at where some standard modules are located. That's the
+        # indication for "installed with the interpreter". In some
+        # environments (virtualenv, for example), these modules may be
+        # spread across a few locations. Look at all the candidate modules
+        # we've imported, and take all the different directories.
+        self._ignore_dirs = set()
+        candidates = []
+        if not include_sitepackages:
+            candidates.extend([smiley, coverage])
+        if not include_stdlib:
+            candidates.extend([atexit, os, random, socket])
+        for m in candidates:
+            if hasattr(m, "__file__"):
+                self._ignore_dirs.add(
+                    os.path.dirname(m.__file__).rstrip(os.sep) + os.sep
+                )
 
     def _get_interesting_locals(self, frame):
         return {
@@ -90,7 +99,7 @@ class Tracer(object):
         if filename.endswith('>'):
             # builtins?
             return True
-        for d in IGNORE_DIRS:
+        for d in self._ignore_dirs:
             if filename.startswith(d):
                 return True
         return False

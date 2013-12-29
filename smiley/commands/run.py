@@ -33,6 +33,19 @@ class Run(command.Command):
             default='remote',
             help='send data to the remote monitor (default)',
         )
+        include_group = parser.add_argument_group('covering')
+        include_group.add_argument(
+            '--include-stdlib',
+            action='store_true',
+            default=False,
+            help='trace into standard library modules',
+        )
+        include_group.add_argument(
+            '--include-site-packages',
+            action='store_true',
+            default=False,
+            help='trace into modules from site-packages',
+        )
         parser.add_argument(
             '--database',
             default='smiley.db',
@@ -64,6 +77,10 @@ class Run(command.Command):
             p = publisher.Publisher(parsed_args.socket)
         else:
             p = local.LocalPublisher(parsed_args.database)
-        t = tracer.Tracer(p)
+        t = tracer.Tracer(
+            p,
+            include_stdlib=parsed_args.include_stdlib,
+            include_sitepackages=parsed_args.include_site_packages,
+        )
         t.run(parsed_args.command)
         return

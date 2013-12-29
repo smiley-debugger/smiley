@@ -19,6 +19,11 @@ dev
   clutter.
 - Make the tests pass under python 3.3. Still not doing any live
   testing with python3 apps, but this is a start.
+- Add an option to :ref:`command-run` to include modules from the
+  standard libary. This is disabled by default.
+- Add an option to :ref:`command-run` to include modules from the
+  ``site-packages`` directory (for third-party installed
+  modules). This is disabled by default.
 
 0.5
 ===

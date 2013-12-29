@@ -32,6 +32,10 @@ class TracerTest(testtools.TestCase):
         t = tracer.Tracer(None)
         self.assertTrue(t._should_ignore_file(atexit.__file__))
 
+    def test_capture_stdlib(self):
+        t = tracer.Tracer(None, include_stdlib=True)
+        self.assertFalse(t._should_ignore_file(atexit.__file__))
+
     def test_ignore_smiley(self):
         t = tracer.Tracer(None)
         self.assertTrue(t._should_ignore_file(tracer.__file__))
