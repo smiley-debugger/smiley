@@ -1,4 +1,6 @@
 import functools
+import logging
+import math
 
 from pecan import expose, request
 from pecan.rest import RestController
@@ -9,6 +11,8 @@ from smiley.web import nav
 from smiley.web.controllers import files
 from smiley.web.controllers import stats
 from smiley.web import syntax
+
+LOG = logging.getLogger(__name__)
 
 
 def collapse_trace(trace_iter):
@@ -83,6 +87,9 @@ class RunController(RestController):
     files = files.FileController()
     stats = stats.StatsController()
 
+    _cached_run_id = None
+    _cached_trace = None
+
     @expose(generic=True, template='runs.html')
     @nav.active_section('runs')
     def get_all(self):
@@ -93,10 +100,33 @@ class RunController(RestController):
 
     @expose(generic=True, template='run.html')
     @nav.active_section('runs', 'details')
-    def get_one(self, run_id):
+    def get_one(self, run_id, page=1):
         run = request.db.get_run(run_id)
-        trace = collapse_trace(request.db.get_trace(run_id))
+
+        if run_id == self._cached_run_id and self._cached_trace:
+            LOG.debug('using cached trace for %s', run_id)
+            trace = self._cached_trace
+        else:
+            LOG.debug('computing trace for %s', run_id)
+            trace = list(collapse_trace(request.db.get_trace(run_id)))
+            self._cached_run_id = run_id
+            self._cached_trace = trace
         syntax_line_cache = syntax.StyledLineCache(request.db, run_id)
+
+        # PAGINATION MATH
+        per_page = 20  # FIXME: module constant? input?
+        num_pages = int(math.ceil(len(trace) / (per_page * 1.0)))
+        try:
+            page = int(page)
+        except (TypeError, ValueError):
+            page = 1
+        if page < 1:
+            page = 1
+        if page > num_pages:
+            page = num_pages
+
+        start = (page - 1) * per_page
+        end = start + per_page
 
         def getlines(filename, nums):
             start, end = nums
@@ -104,9 +134,11 @@ class RunController(RestController):
                                               include_comments=True)
 
         return {
+            'page': page,
+            'num_pages': num_pages,
             'run_id': run_id,
             'run': run,
-            'trace': trace,
+            'trace': trace[start:end],
             'getlines': getlines,
             'getfileid': functools.partial(request.db.get_file_signature,
                                            run_id=run_id),

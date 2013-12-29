@@ -27,6 +27,7 @@ dev
 - Add an option to :ref:`command-run` to include a specific package in
   the trace output by name on the command line.
 - Updated to Bootstrap 3 CSS framework.
+- Add basic pagination support to the detailed trace report.
 
 0.5
 ===

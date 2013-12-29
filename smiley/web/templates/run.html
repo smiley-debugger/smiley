@@ -27,8 +27,31 @@ ${n} = ${pformat(v, width=15)}
 % endfor
 </%def>
 
+<%def name="pagination(page, num_pages)">
+<ul class="pagination">
+% if page <= 1:
+  <li class="disabled"><a href="/runs/${run_id}">&laquo;</a></li>
+% else:
+  <li><a href="/runs/${run_id}?page=${page-1}">&laquo;</a></li>
+% endif
+% for p in range(1, num_pages + 1):
+  <li
+% if p == page:
+ class="active"
+% endif
+><a href="/runs/${run_id}?page=${p}">${p}</a></li>
+% endfor
+% if page >= num_pages:
+  <li class="disabled"><a href="/runs/${run_id}?page=${num_pages}">&raquo;</a></li>
+% else:
+  <li><a href="/runs/${run_id}?page=${page+1}">&raquo;</a></li>
+% endif
+</%def>
+
 <div class="row">
   <div id="content" class="col-md-12">
+
+    ${pagination(page, num_pages)}
 
     <table class="table table-striped table-condensed">
       <thead>
@@ -80,6 +103,8 @@ older = t.local_vars or {}
 % endfor        
       </tbody>
     </table>
+
+    ${pagination(page, num_pages)}
 
   </div>
 </div>
