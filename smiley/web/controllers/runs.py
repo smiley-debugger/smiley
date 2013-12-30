@@ -103,7 +103,9 @@ def get_pagination_values(page, per_page, num_items):
     # We don't want to show every page number, so figure out
     # the ranges we *do* want to show.
     page_ranges = []
-    if page <= 5:
+    if num_pages <= 7:
+        page_ranges.append((1, num_pages))
+    elif page <= 5:
         page_ranges.append((1, 5))
         page_ranges.append((num_pages, num_pages))
     elif page >= num_pages - 5 + 1:

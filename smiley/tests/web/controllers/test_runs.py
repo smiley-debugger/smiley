@@ -1,3 +1,4 @@
+import testscenarios
 import testtools
 
 from smiley import db
@@ -318,24 +319,49 @@ class CollapseTraceTest(testtools.TestCase):
                          {'V1': 1, 'V2': 2})
 
 
-class PaginationTest(testtools.TestCase):
+class PaginationTest(testscenarios.TestWithScenarios):
 
-    def test_page_range_1(self):
-        p = runs.get_pagination_values(1, 5, 100)
-        self.assertEqual([(1, 5), (20, 20)], p['page_ranges'])
+    scenarios = [
 
-    def test_page_range_2(self):
-        p = runs.get_pagination_values(2, 5, 100)
-        self.assertEqual([(1, 5), (20, 20)], p['page_ranges'])
+        ('1 of 20', {'page': 1,
+                     'per_page': 5,
+                     'num_items': 5 * 20,
+                     'expected': [(1, 5), (20, 20)]}),
+        ('2 of 20', {'page': 2,
+                     'per_page': 5,
+                     'num_items': 5 * 20,
+                     'expected': [(1, 5), (20, 20)]}),
+        ('10 of 20', {'page': 10,
+                      'per_page': 5,
+                      'num_items': 5 * 20,
+                      'expected': [(1, 1), (8, 12), (20, 20)]}),
+        ('19 of 20', {'page': 19,
+                      'per_page': 5,
+                      'num_items': 5 * 20,
+                      'expected': [(1, 1), (16, 20)]}),
+        ('20 of 20', {'page': 20,
+                      'per_page': 5,
+                      'num_items': 5 * 20,
+                      'expected': [(1, 1), (16, 20)]}),
 
-    def test_page_range_10(self):
-        p = runs.get_pagination_values(10, 5, 100)
-        self.assertEqual([(1, 1), (8, 12), (20, 20)], p['page_ranges'])
+        ('1 of 5', {'page': 1,
+                    'per_page': 5,
+                    'num_items': 5 * 5,
+                    'expected': [(1, 5)]}),
+        ('2 of 5', {'page': 2,
+                    'per_page': 5,
+                    'num_items': 5 * 5,
+                    'expected': [(1, 5)]}),
 
-    def test_page_range_19(self):
-        p = runs.get_pagination_values(19, 5, 100)
-        self.assertEqual([(1, 1), (16, 20)], p['page_ranges'])
+        ('1 of 7', {'page': 1,
+                    'per_page': 5,
+                    'num_items': 5 * 7,
+                    'expected': [(1, 7)]}),
 
-    def test_page_range_20(self):
-        p = runs.get_pagination_values(20, 5, 100)
-        self.assertEqual([(1, 1), (16, 20)], p['page_ranges'])
+    ]
+
+    def test(self):
+        actual = runs.get_pagination_values(self.page,
+                                            self.per_page,
+                                            self.num_items)
+        self.assertEqual(self.expected, actual['page_ranges'])
