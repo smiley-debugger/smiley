@@ -1,3 +1,7 @@
+import subprocess
+import tempfile
+
+
 def format_data(run_id, stats, db):
     # FIXME(dhellmann): Don't hard-code the sort order
     stats.sort_stats('cumtime')
@@ -15,3 +19,13 @@ def format_data(run_id, stats, db):
             'lineno': func[1],
             'function': func[2],
         }
+
+
+def generate_call_graph(stats):
+    with tempfile.NamedTemporaryFile(mode='w') as f:
+        stats.dump_stats(f.name)
+        image_data = subprocess.check_output(
+            'gprof2dot -f pstats %s | dot -Tpng' % f.name,
+            shell=True,
+        )
+    return image_data

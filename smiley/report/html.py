@@ -90,6 +90,21 @@ class StatsPage(Page):
         )
 
 
+class CallGraphPage(Page):
+    TEMPLATE = 'call_graph.html'
+
+    def __init__(self, report):
+        super(CallGraphPage, self).__init__(report)
+        self.stats_data = report.run_details.stats
+        self.image_filename = os.path.join(report.output_dir, 'call_graph.png')
+
+    def render(self):
+        image_data = stats.generate_call_graph(self.stats_data)
+        with open(self.image_filename, 'w') as f:
+            f.write(image_data)
+        return super(CallGraphPage, self).render()
+
+
 class HTMLReport(object):
 
     def __init__(self, run_id, output_dir, database, title, per_page):
@@ -172,6 +187,11 @@ class HTMLReport(object):
         self._render_page(
             StatsPage(self),
             'stats.html',
+        )
+
+        self._render_page(
+            CallGraphPage(self),
+            'call_graph.html',
         )
 
         self._copy_static_files()

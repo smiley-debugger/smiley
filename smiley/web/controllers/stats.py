@@ -1,7 +1,5 @@
 import functools
 import logging
-import subprocess
-import tempfile
 
 from pecan import expose, request
 
@@ -39,13 +37,7 @@ class StatsController(object):
     def graph_data(self, run_id):
         run = request.db.get_run(run_id)
         try:
-            with tempfile.NamedTemporaryFile(mode='w') as f:
-                run.stats.dump_stats(f.name)
-                image_data = subprocess.check_output(
-                    'gprof2dot -f pstats %s | dot -Tpng' % f.name,
-                    shell=True,
-                )
+            return stats.generate_call_graph(run.stats)
         except:
             LOG.exception('could not generate image')
             raise
-        return image_data
