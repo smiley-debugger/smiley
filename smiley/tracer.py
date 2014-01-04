@@ -7,6 +7,7 @@ import marshal
 import os
 import pstats
 import random
+import site
 import socket
 import sys
 import tempfile
@@ -49,6 +50,14 @@ class TracerContext(object):
 
 class Tracer(object):
 
+    def _canonical_path(self, path):
+        return path.rstrip(os.sep) + os.sep
+
+    def _canonical_parent(self, filename):
+        return self._canonical_path(
+            os.path.dirname(os.path.realpath(filename))
+        )
+
     def __init__(self, publisher,
                  include_stdlib=False,
                  include_site_packages=True,
@@ -71,12 +80,21 @@ class Tracer(object):
         # Always default to ignoring smiley and the coverage module
         candidates = [smiley, coverage]
         if not include_stdlib:
-            candidates.extend([atexit, os, random, socket])
+            stdlibdir = self._canonical_path(os.path.join(
+                sys.prefix,
+                'lib',
+                'python%s.%s' % sys.version_info[:2],
+            ))
+            LOG.debug('ignoring stdlib %s', stdlibdir)
+            self._ignore_dirs.add(stdlibdir)
+            candidates.extend([atexit, os, random, socket, site])
         for m in candidates:
             if hasattr(m, "__file__"):
-                to_ignore = os.path.dirname(m.__file__).rstrip(os.sep) + os.sep
-                LOG.debug('ignoring packages under %s', to_ignore)
+                to_ignore = self._canonical_parent(m.__file__)
+                LOG.debug('ignoring packages under %s based on %s',
+                          to_ignore, m.__name__)
                 self._ignore_dirs.add(to_ignore)
+        LOG.debug('ignoring packages from %s', sorted(self._ignore_dirs))
 
         # Build the list of packages we are always going to
         # include. Since the site-packages directory is under the
@@ -92,7 +110,7 @@ class Tracer(object):
                 LOG.info('Could not find %r to include it: %s',
                          name, e)
             else:
-                to_include = os.path.dirname(filename).rstrip(os.sep) + os.sep
+                to_include = self._canonical_parent(filename)
                 LOG.debug('including packages under %s', to_include)
                 self._include_packages.add(to_include)
         if include_site_packages:
@@ -100,9 +118,12 @@ class Tracer(object):
             # installed) but is not smiley (which will not work in a
             # test environment) to find the site-packages directory.
             import cliff
-            site_packages = os.path.dirname(os.path.dirname(cliff.__file__))
+            site_packages = self._canonical_parent(
+                self._canonical_parent(cliff.__file__)
+            )
             LOG.debug('including site-packages %s', site_packages)
-            self._include_packages.add(site_packages.rstrip(os.sep) + os.sep)
+            self._include_packages.add(site_packages)
+        LOG.debug('including packages from %s', sorted(self._include_packages))
 
     def _get_interesting_locals(self, frame):
         return {
@@ -126,6 +147,7 @@ class Tracer(object):
         if filename.endswith('>'):
             # builtins?
             return True
+        filename = os.path.realpath(filename)
         for d in self._include_packages:
             if filename.startswith(d):
                 return False
