@@ -1,7 +1,7 @@
 <%inherit file="layout.html" />
 
 <%! from pprint import pformat %>
-<%! from smiley.web.syntax import syntax %>
+<%! from smiley.presentation.syntax import syntax %>
 <%! from smiley.util import get_variable_changes %>
 
 <%def name="style()">
@@ -27,55 +27,17 @@ ${n} = ${pformat(v, width=15)}
 % endfor
 </%def>
 
+<%def name="nextandprev()">
+NEXT AND PREV LINKS
+</%def>
+
 <%def name="page_link(page, per_page)">
 /runs/${run_id}?page=${page}&per_page=${per_page}
 </%def>
 
-<%def name="pagination(page, num_pages, per_page)">
-<ul class="pagination">
-% if page <= 1:
-  <li class="disabled"><a href="${page_link(1, per_page)}">&laquo;</a></li>
-% else:
-  <li><a href="${page_link(page-1, per_page)}">&laquo;</a></li>
-% endif
-% for r in page_ranges:
-% for p in range(r[0], r[1]+1):
-  <li
-% if p == page:
- class="active"
-% endif
-><a href="${page_link(p, per_page)}">${p}</a></li>
-% endfor
-% if len(page_ranges) > 1 and r != page_ranges[-1]:
-    <li class="disabled"><a>...</a></li>
-% endif
-% endfor
-% if page >= num_pages:
-  <li class="disabled"><a href="${page_link(num_pages, per_page)}">&raquo;</a></li>
-% else:
-  <li><a href="${page_link(page+1, per_page)}">&raquo;</a></li>
-% endif
-</ul>
-</%def>
-
 <div class="row">
-  <div class="col-md-6">
-    ${pagination(page, num_pages, per_page)}
-  </div>
-
-  <div class="col-md-4 col-md-offset-2">
-      Items to show:
-    <div id="per-page-selector" class="btn-group">
-    % for n in [5, 10, 20, 50, 100]:
-      <a
-         % if n == per_page:
-         class="btn btn-primary" 
-         % else:
-         class="btn btn-default" 
-         % endif
-         href="${page_link(1, n)}">${n}</a>
-    % endfor
-    </div>
+  <div class="col-md-1">
+    ${nextandprev()}
   </div>
 </div>
 
@@ -97,7 +59,7 @@ older = {}
 % for t in trace:
         <tr>
           <td>
-            <a href="/runs/${run_id}/files/${getfileid(filename=t.filename)}">${t.filename|self.display_filename}</a>:
+            <a href="file-${getfileid(filename=t.filename)}.html">${t.filename|self.display_filename}</a>:
 % if t.line_no[0] == t.line_no[1]:
           ${t.line_no[0]}
 % else:
@@ -132,7 +94,11 @@ older = t.local_vars or {}
       </tbody>
     </table>
 
-    ${pagination(page, num_pages, per_page)}
+  </div>
+</div>
 
+<div class="row">
+  <div class="col-md-1">
+    ${nextandprev()}
   </div>
 </div>

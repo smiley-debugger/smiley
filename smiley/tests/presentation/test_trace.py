@@ -1,14 +1,13 @@
-import testscenarios
 import testtools
 
 from smiley import db
-from smiley import presentation
+from smiley.presentation import trace
 
 
 class CollapseTraceTest(testtools.TestCase):
 
     def test_consecutive_lines(self):
-        trace = [
+        trace_data = [
             db.Trace(
                 id='1',
                 run_id='1',
@@ -46,13 +45,13 @@ class CollapseTraceTest(testtools.TestCase):
                 timestamp=1,
             ),
         ]
-        collapsed = list(presentation.collapse_trace(trace))
+        collapsed = list(trace.collapse_trace(trace_data))
         self.assertEqual(len(collapsed), 1)
         line_nos = [r.line_no for r in collapsed]
         self.assertEqual(line_nos, [(1, 3)])
 
     def test_non_consecutive_lines(self):
-        trace = [
+        trace_data = [
             db.Trace(
                 id='1',
                 run_id='1',
@@ -90,13 +89,13 @@ class CollapseTraceTest(testtools.TestCase):
                 timestamp=1,
             ),
         ]
-        collapsed = list(presentation.collapse_trace(trace))
+        collapsed = list(trace.collapse_trace(trace_data))
         self.assertEqual(len(collapsed), 1)
         line_nos = [r.line_no for r in collapsed]
         self.assertEqual(line_nos, [(1, 40)])
 
     def test_call_lines_return(self):
-        trace = [
+        trace_data = [
             db.Trace(
                 id='1',
                 run_id='1',
@@ -146,7 +145,7 @@ class CollapseTraceTest(testtools.TestCase):
                 timestamp=1,
             ),
         ]
-        collapsed = list(presentation.collapse_trace(trace))
+        collapsed = list(trace.collapse_trace(trace_data))
         self.assertEqual(len(collapsed), 3)
         line_nos = [r.line_no for r in collapsed]
         self.assertEqual(line_nos, [(1, 1),
@@ -154,7 +153,7 @@ class CollapseTraceTest(testtools.TestCase):
                                     (2, 2)])
 
     def test_new_var(self):
-        trace = [
+        trace_data = [
             db.Trace(
                 id='1',
                 run_id='1',
@@ -185,13 +184,13 @@ class CollapseTraceTest(testtools.TestCase):
                 timestamp=1,
             ),
         ]
-        collapsed = list(presentation.collapse_trace(trace))
+        collapsed = list(trace.collapse_trace(trace_data))
         self.assertEqual(len(collapsed), 1)
         self.assertEqual(collapsed[0].local_vars,
                          {'v1': 1, 'v2': 2})
 
     def test_changed_var(self):
-        trace = [
+        trace_data = [
             db.Trace(
                 id='1',
                 run_id='1',
@@ -224,7 +223,7 @@ class CollapseTraceTest(testtools.TestCase):
                 timestamp=1,
             ),
         ]
-        collapsed = list(presentation.collapse_trace(trace))
+        collapsed = list(trace.collapse_trace(trace_data))
         self.assertEqual(len(collapsed), 2)
         self.assertEqual(collapsed[0].local_vars,
                          {'v1': 1, 'v3': 3})
@@ -232,7 +231,7 @@ class CollapseTraceTest(testtools.TestCase):
                          {'v1': 1, 'v2': 2, 'v3': 4})
 
     def test_changed_var2(self):
-        trace = [
+        trace_data = [
             db.Trace(
                 id='1',
                 run_id='1',
@@ -309,7 +308,7 @@ class CollapseTraceTest(testtools.TestCase):
                 timestamp=1,
             ),
         ]
-        collapsed = list(presentation.collapse_trace(trace))
+        collapsed = list(trace.collapse_trace(trace_data))
         self.assertEqual(len(collapsed), 4)
         self.assertEqual(collapsed[0].local_vars,
                          {'v1': 1, 'v3': 3})
@@ -317,51 +316,3 @@ class CollapseTraceTest(testtools.TestCase):
                          {'v1': 1, 'v2': 2, 'v3': 4})
         self.assertEqual(collapsed[3].local_vars,
                          {'V1': 1, 'V2': 2})
-
-
-class PaginationTest(testscenarios.TestWithScenarios):
-
-    scenarios = [
-
-        ('1 of 20', {'page': 1,
-                     'per_page': 5,
-                     'num_items': 5 * 20,
-                     'expected': [(1, 5), (20, 20)]}),
-        ('2 of 20', {'page': 2,
-                     'per_page': 5,
-                     'num_items': 5 * 20,
-                     'expected': [(1, 5), (20, 20)]}),
-        ('10 of 20', {'page': 10,
-                      'per_page': 5,
-                      'num_items': 5 * 20,
-                      'expected': [(1, 1), (8, 12), (20, 20)]}),
-        ('19 of 20', {'page': 19,
-                      'per_page': 5,
-                      'num_items': 5 * 20,
-                      'expected': [(1, 1), (16, 20)]}),
-        ('20 of 20', {'page': 20,
-                      'per_page': 5,
-                      'num_items': 5 * 20,
-                      'expected': [(1, 1), (16, 20)]}),
-
-        ('1 of 5', {'page': 1,
-                    'per_page': 5,
-                    'num_items': 5 * 5,
-                    'expected': [(1, 5)]}),
-        ('2 of 5', {'page': 2,
-                    'per_page': 5,
-                    'num_items': 5 * 5,
-                    'expected': [(1, 5)]}),
-
-        ('1 of 7', {'page': 1,
-                    'per_page': 5,
-                    'num_items': 5 * 7,
-                    'expected': [(1, 7)]}),
-
-    ]
-
-    def test(self):
-        actual = presentation.get_pagination_values(self.page,
-                                                    self.per_page,
-                                                    self.num_items)
-        self.assertEqual(self.expected, actual['page_ranges'])

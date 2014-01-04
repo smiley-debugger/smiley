@@ -1,8 +1,8 @@
 from pecan import expose, request
 from pecan.rest import RestController
 
+from smiley.presentation import syntax
 from smiley.web import nav
-from smiley.web import syntax
 
 
 class FileController(RestController):

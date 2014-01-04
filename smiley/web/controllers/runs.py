@@ -4,11 +4,12 @@ import logging
 from pecan import expose, request
 from pecan.rest import RestController
 
-from smiley import presentation
+from smiley.presentation import pagination
+from smiley.presentation import syntax
+from smiley.presentation import trace
 from smiley.web import nav
 from smiley.web.controllers import files
 from smiley.web.controllers import stats
-from smiley.web import syntax
 
 LOG = logging.getLogger(__name__)
 
@@ -36,21 +37,21 @@ class RunController(RestController):
 
         if run_id == self._cached_run_id and self._cached_trace:
             LOG.debug('using cached trace for %s', run_id)
-            trace = self._cached_trace
+            trace_data = self._cached_trace
         else:
             LOG.debug('computing trace for %s', run_id)
-            trace = list(
-                presentation.collapse_trace(request.db.get_trace(run_id))
+            trace_data = list(
+                trace.collapse_trace(request.db.get_trace(run_id))
             )
             self._cached_run_id = run_id
-            self._cached_trace = trace
+            self._cached_trace = trace_data
         syntax_line_cache = syntax.StyledLineCache(request.db, run_id)
 
-        pagination = presentation.get_pagination_values(
-            page, per_page, len(trace),
+        page_vals = pagination.get_pagination_values(
+            page, per_page, len(trace_data),
         )
-        start = pagination['start']
-        end = pagination['end']
+        start = page_vals['start']
+        end = page_vals['end']
 
         def getlines(filename, nums):
             start, end = nums
@@ -60,10 +61,10 @@ class RunController(RestController):
         context = {
             'run_id': run_id,
             'run': run,
-            'trace': trace[start:end],
+            'trace': trace_data[start:end],
             'getlines': getlines,
             'getfileid': functools.partial(request.db.get_file_signature,
                                            run_id=run_id),
         }
-        context.update(pagination)
+        context.update(page_vals)
         return context
