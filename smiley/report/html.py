@@ -42,9 +42,8 @@ class Page(object):
 class IndexPage(Page):
     TEMPLATE = 'index.html'
 
-    def __init__(self, report, num_pages):
+    def __init__(self, report):
         super(IndexPage, self).__init__(report)
-        self.context['num_pages'] = num_pages
 
 
 class TracePage(Page):
@@ -137,9 +136,22 @@ class HTMLReport(object):
             include_comments=True,
         )
 
+    def _copy_static_files(self):
+        static_dir = os.path.join(self.report_dir, 'static')
+        for in_dir in os.listdir(static_dir):
+            src = os.path.join(static_dir, in_dir)
+            dst = os.path.join(self.output_dir, in_dir)
+            if os.path.exists(dst):
+                LOG.debug('cleaning up %s', dst)
+                shutil.rmtree(dst)
+            LOG.info('copying static files: %s', in_dir)
+            shutil.copytree(src, dst)
+
     def run(self):
         LOG.info('writing output to %s', self.output_dir)
 
+        # Do some initial calculations to figure out how many pages we
+        # have.
         trace_data = list(
             trace.collapse_trace(self.db.get_trace(self.run_id))
         )
@@ -148,14 +160,16 @@ class HTMLReport(object):
         )
         last_page = page_vals['num_pages'] + 1
 
+        # Start producing output pages
         self._render_page(
             IndexPage(
                 report=self,
-                num_pages=page_vals['num_pages'],
             ),
             'index.html',
         )
 
+        # The trace output is paginated, so we have multiple pages to
+        # produce.
         for i in xrange(1, last_page):
             page_vals = pagination.get_pagination_values(
                 i, self.per_page, len(trace_data),
@@ -173,6 +187,7 @@ class HTMLReport(object):
                 page_name,
             )
 
+        # The source code from the run
         run_files = list(self.db.get_files_for_run(self.run_id))
         self._render_page(
             FilesPage(self, run_files),
@@ -188,25 +203,11 @@ class HTMLReport(object):
             StatsPage(self),
             'stats.html',
         )
-
         self._render_page(
             CallGraphPage(self),
             'call_graph.html',
         )
 
+        # Make sure we have all of the CSS and JavaScript files needed
+        # by the templates.
         self._copy_static_files()
-
-        # [ ] stats page
-        # [ ] call graph page
-        # [ ] call graph image
-
-    def _copy_static_files(self):
-        static_dir = os.path.join(self.report_dir, 'static')
-        for in_dir in os.listdir(static_dir):
-            src = os.path.join(static_dir, in_dir)
-            dst = os.path.join(self.output_dir, in_dir)
-            if os.path.exists(dst):
-                LOG.debug('cleaning up %s', dst)
-                shutil.rmtree(dst)
-            LOG.info('copying static files: %s', in_dir)
-            shutil.copytree(src, dst)
