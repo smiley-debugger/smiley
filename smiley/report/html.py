@@ -7,6 +7,7 @@ from mako.lookup import TemplateLookup
 
 from smiley import db_linecache
 from smiley.presentation import pagination
+from smiley.presentation import stats
 from smiley.presentation import trace
 from smiley.presentation import syntax
 
@@ -22,6 +23,10 @@ class Page(object):
             'subtitle': report.title,
             'run_id': report.run_id,
             'run': report.run_details,
+            'getfileid': functools.partial(
+                report.db.get_file_signature,
+                run_id=report.run_id,
+            ),
         }
         if self.TEMPLATE:
             self.template = report.template_lookup.get_template(self.TEMPLATE)
@@ -50,10 +55,6 @@ class TracePage(Page):
         self.context['trace'] = trace
         self.context.update(pagination)
         self.context['getlines'] = getlines
-        self.context['getfileid'] = functools.partial(
-            report.db.get_file_signature,
-            run_id=report.run_id,
-        )
 
 
 class FilesPage(Page):
@@ -75,6 +76,18 @@ class FilePage(Page):
             file_info.signature,
         )
         self.context['styled_body'] = syntax.apply_style(filename, body)
+
+
+class StatsPage(Page):
+    TEMPLATE = 'stats.html'
+
+    def __init__(self, report):
+        super(StatsPage, self).__init__(report)
+        self.context['stats_data'] = stats.format_data(
+            report.run_id,
+            report.run_details.stats,
+            report.db,
+        )
 
 
 class HTMLReport(object):
@@ -156,41 +169,16 @@ class HTMLReport(object):
                 'file-%s.html' % run_file.signature,
             )
 
+        self._render_page(
+            StatsPage(self),
+            'stats.html',
+        )
+
         self._copy_static_files()
 
-        # [ ] index.html to show basic details and link to the trace,
-        #     files, stats, and call graph pages
-        # [ ] trace 1..n pages
-        # [ ] file list page
-        # [ ] file contents page(s)
         # [ ] stats page
         # [ ] call graph page
         # [ ] call graph image
-        # [x] copy static files
-
-        # self.out.start_run(
-        #     run_details.id,
-        #     run_details.cwd,
-        #     run_details.description,
-        #     run_details.start_time,
-        # )
-        # for t in self.db.get_trace(parsed_args.run_id):
-        #     self.out.trace(
-        #         t.run_id,
-        #         t.event,
-        #         t.func_name,
-        #         t.line_no,
-        #         t.filename,
-        #         t.trace_arg,
-        #         t.local_vars,
-        #         t.timestamp,
-        #     )
-        # self.out.end_run(
-        #     run_details.id,
-        #     run_details.end_time,
-        #     run_details.error_message,
-        #     None,  # run_details.traceback,
-        # )
 
     def _copy_static_files(self):
         static_dir = os.path.join(self.report_dir, 'static')

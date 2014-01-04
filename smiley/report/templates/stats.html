@@ -1,0 +1,71 @@
+<%inherit file="layout.html" />
+
+<%def name="style()">
+<link href="css/stats.css" rel="stylesheet">
+</%def>
+
+% if run.stats:
+<p></p>
+
+<div class="row">
+  <div id="content" class="col-md-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">Summary</div>
+      <table class="table">
+        <tr><th>Function calls</th><td>${run.stats.total_calls}</td></tr>
+% if run.stats.total_calls != run.stats.prim_calls:
+        <tr><th>Primitive calls</th><td>${run.stats.prim_calls}</td></tr>
+% endif
+        <tr><th>Total time</th><td>${run.stats.total_tt}</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div id="content" class="col-md-12">
+
+    <table class="table table-striped table-condensed stats-table">
+      <thead>
+        <tr>
+          <th>ncalls</th>
+          <th>tottime</th>
+          <th>percall</th>
+          <th>cumtime</th>
+          <th>percall</th>
+          <th>function</th>
+          <th>filename</th>
+          <th>lineno</th>
+        </tr>
+      </thead>
+      <tbody>
+% for s in stats_data:
+        <tr>
+          <td style="text-align: right">${s['ncalls']}</td>
+          <td>${'%8.3f' % s['tottime']}</td>
+          <td>${'%8.3f' % s['percall_nc']}</td>
+          <td>${'%8.3f' % s['cumtime']}</td>
+          <td>${'%8.3f' % s['percall_cc']}</td>
+          <td class="text"><tt>${s['function']}</tt></td>
+          <td class="text">
+% if s['file_url']:
+            <a href="file-${getfileid(filename=s['filename'])}.html">${s['filename']|self.display_filename}</a>
+% else:
+            ${s['filename']|self.display_filename}
+% endif
+          </td>
+          <td>${s['lineno']}</td>
+        </tr>
+% endfor        
+      </tbody>
+    </table>
+
+  </div>
+</div>
+% else:
+<div class="row">
+  <div id="content" class="col-md-12">
+    <p>No profile data was collected.</p>
+  </div>
+</div>
+% endif
