@@ -2,7 +2,7 @@ import testscenarios
 import testtools
 
 from smiley import db
-from smiley.web.controllers import runs
+from smiley import presentation
 
 
 class CollapseTraceTest(testtools.TestCase):
@@ -46,7 +46,7 @@ class CollapseTraceTest(testtools.TestCase):
                 timestamp=1,
             ),
         ]
-        collapsed = list(runs.collapse_trace(trace))
+        collapsed = list(presentation.collapse_trace(trace))
         self.assertEqual(len(collapsed), 1)
         line_nos = [r.line_no for r in collapsed]
         self.assertEqual(line_nos, [(1, 3)])
@@ -90,7 +90,7 @@ class CollapseTraceTest(testtools.TestCase):
                 timestamp=1,
             ),
         ]
-        collapsed = list(runs.collapse_trace(trace))
+        collapsed = list(presentation.collapse_trace(trace))
         self.assertEqual(len(collapsed), 1)
         line_nos = [r.line_no for r in collapsed]
         self.assertEqual(line_nos, [(1, 40)])
@@ -146,7 +146,7 @@ class CollapseTraceTest(testtools.TestCase):
                 timestamp=1,
             ),
         ]
-        collapsed = list(runs.collapse_trace(trace))
+        collapsed = list(presentation.collapse_trace(trace))
         self.assertEqual(len(collapsed), 3)
         line_nos = [r.line_no for r in collapsed]
         self.assertEqual(line_nos, [(1, 1),
@@ -185,7 +185,7 @@ class CollapseTraceTest(testtools.TestCase):
                 timestamp=1,
             ),
         ]
-        collapsed = list(runs.collapse_trace(trace))
+        collapsed = list(presentation.collapse_trace(trace))
         self.assertEqual(len(collapsed), 1)
         self.assertEqual(collapsed[0].local_vars,
                          {'v1': 1, 'v2': 2})
@@ -224,7 +224,7 @@ class CollapseTraceTest(testtools.TestCase):
                 timestamp=1,
             ),
         ]
-        collapsed = list(runs.collapse_trace(trace))
+        collapsed = list(presentation.collapse_trace(trace))
         self.assertEqual(len(collapsed), 2)
         self.assertEqual(collapsed[0].local_vars,
                          {'v1': 1, 'v3': 3})
@@ -309,7 +309,7 @@ class CollapseTraceTest(testtools.TestCase):
                 timestamp=1,
             ),
         ]
-        collapsed = list(runs.collapse_trace(trace))
+        collapsed = list(presentation.collapse_trace(trace))
         self.assertEqual(len(collapsed), 4)
         self.assertEqual(collapsed[0].local_vars,
                          {'v1': 1, 'v3': 3})
@@ -361,7 +361,7 @@ class PaginationTest(testscenarios.TestWithScenarios):
     ]
 
     def test(self):
-        actual = runs.get_pagination_values(self.page,
-                                            self.per_page,
-                                            self.num_items)
+        actual = presentation.get_pagination_values(self.page,
+                                                    self.per_page,
+                                                    self.num_items)
         self.assertEqual(self.expected, actual['page_ranges'])
