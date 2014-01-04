@@ -51,6 +51,20 @@ server
 Run a web server for browsing the pre-recorded run data collected
 by the ``record`` command.
 
+.. _command-report:
+
+report
+======
+
+Export a set of HTML files describing the pre-recorded run data
+collected by the ``record`` command.
+
+.. seealso::
+
+  * `sample report output`_
+
+.. _sample report output: https://dl.dropboxusercontent.com/u/7152077/smiley/80b5b6ca-2224-4749-bbdd-b7fac45204bf/index.html
+
 .. _command-stats-show:
 
 stats show
