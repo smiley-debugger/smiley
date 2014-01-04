@@ -1,0 +1,28 @@
+pre {
+	/* remove the border and color added by bootstrap */
+	border: none;
+	background: transparent;
+	margin: 0;
+	padding: 0;
+
+	/* do not wrap lines */
+	overflow: auto;
+	word-wrap: normal;
+	white-space: pre;
+}
+
+td.run-source {
+	padding-left: 0.5em;
+}
+
+/* taken from bootstrap's .pre-scrollable class, which we can't use
+because we can't tell pygments to add a css class to the pre tag it
+emits */
+td.run-source div.highlight pre {
+	max-height: 340px;
+	overflow-y: scroll;
+}
+
+div#per-page-selector {
+	margin: 20px 0;
+}
