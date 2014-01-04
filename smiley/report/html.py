@@ -15,7 +15,6 @@ LOG = logging.getLogger(__name__)
 
 
 class Page(object):
-
     TEMPLATE = None
 
     def __init__(self, report):
@@ -26,8 +25,10 @@ class Page(object):
         }
         if self.TEMPLATE:
             self.template = report.template_lookup.get_template(self.TEMPLATE)
+            self.context['active_section'] = self.TEMPLATE.partition('.')[0]
         else:
             self.template = None
+            self.context['active_section'] = None
 
     def render(self):
         return self.template.render_unicode(**self.context)
@@ -35,6 +36,10 @@ class Page(object):
 
 class IndexPage(Page):
     TEMPLATE = 'index.html'
+
+    def __init__(self, report, num_pages):
+        super(IndexPage, self).__init__(report)
+        self.context['num_pages'] = num_pages
 
 
 class TracePage(Page):
@@ -49,6 +54,27 @@ class TracePage(Page):
             report.db.get_file_signature,
             run_id=report.run_id,
         )
+
+
+class FilesPage(Page):
+    TEMPLATE = 'files.html'
+
+    def __init__(self, report, files):
+        super(FilesPage, self).__init__(report)
+        self.context['files'] = files
+
+
+class FilePage(Page):
+    TEMPLATE = 'file.html'
+
+    def __init__(self, report, file_info):
+        super(FilePage, self).__init__(report)
+        self.context['active_section'] = 'files'
+        filename, body = report.db.get_cached_file_by_id(
+            report.run_id,
+            file_info.signature,
+        )
+        self.context['styled_body'] = syntax.apply_style(filename, body)
 
 
 class HTMLReport(object):
@@ -86,8 +112,6 @@ class HTMLReport(object):
     def run(self):
         LOG.info('writing output to %s', self.output_dir)
 
-        self._render_page(IndexPage(self), 'index.html')
-
         trace_data = list(
             trace.collapse_trace(self.db.get_trace(self.run_id))
         )
@@ -95,6 +119,15 @@ class HTMLReport(object):
             1, self.per_page, len(trace_data),
         )
         last_page = page_vals['num_pages'] + 1
+
+        self._render_page(
+            IndexPage(
+                report=self,
+                num_pages=page_vals['num_pages'],
+            ),
+            'index.html',
+        )
+
         for i in xrange(1, last_page):
             page_vals = pagination.get_pagination_values(
                 i, self.per_page, len(trace_data),
@@ -110,6 +143,17 @@ class HTMLReport(object):
                     getlines=self._get_file_lines,
                 ),
                 page_name,
+            )
+
+        run_files = list(self.db.get_files_for_run(self.run_id))
+        self._render_page(
+            FilesPage(self, run_files),
+            'files.html',
+        )
+        for run_file in run_files:
+            self._render_page(
+                FilePage(self, run_file),
+                'file-%s.html' % run_file.signature,
             )
 
         self._copy_static_files()

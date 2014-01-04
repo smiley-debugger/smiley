@@ -32,16 +32,41 @@ NEXT AND PREV LINKS
 </%def>
 
 <%def name="page_link(page, per_page)">
-/runs/${run_id}?page=${page}&per_page=${per_page}
+trace-${page}.html
+</%def>
+
+<%def name="pagination(page, num_pages, per_page)">
+<ul class="pagination">
+% if page <= 1:
+  <li class="disabled"><a href="${page_link(1, per_page)}">&laquo;</a></li>
+% else:
+  <li><a href="${page_link(page-1, per_page)}">&laquo;</a></li>
+% endif
+% for r in page_ranges:
+% for p in range(r[0], r[1]+1):
+  <li
+% if p == page:
+ class="active"
+% endif
+><a href="${page_link(p, per_page)}">${p}</a></li>
+% endfor
+% if len(page_ranges) > 1 and r != page_ranges[-1]:
+    <li class="disabled"><a>...</a></li>
+% endif
+% endfor
+% if page >= num_pages:
+  <li class="disabled"><a href="${page_link(num_pages, per_page)}">&raquo;</a></li>
+% else:
+  <li><a href="${page_link(page+1, per_page)}">&raquo;</a></li>
+% endif
+</ul>
 </%def>
 
 <div class="row">
-  <div class="col-md-1">
-    ${nextandprev()}
+  <div class="col-md-6">
+    ${pagination(page, num_pages, per_page)}
   </div>
-</div>
 
-<div class="row">
   <div id="content" class="col-md-12">
     <table class="table table-striped table-condensed">
       <thead>
@@ -94,11 +119,7 @@ older = t.local_vars or {}
       </tbody>
     </table>
 
-  </div>
-</div>
+    ${pagination(page, num_pages, per_page)}
 
-<div class="row">
-  <div class="col-md-1">
-    ${nextandprev()}
   </div>
 </div>
