@@ -6,5 +6,5 @@ install:
   - pip install -r requirements.txt -r test-requirements.txt --use-mirrors
   - pip install -q . --use-mirrors
 before_script:
-  - flake8 smiley tests
+  - flake8 smiley
 script: python setup.py testr --testr-args='--concurrency=1'
