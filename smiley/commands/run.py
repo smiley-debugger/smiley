@@ -11,6 +11,9 @@ from smiley import tracer
 
 class Run(command.Command):
     """Run another program with monitoring enabled.
+
+    The arguments to 'run' are interpreted as a new command to be
+    executed as though it was run directly, but with tracing enabled.
     """
 
     log = logging.getLogger(__name__)

@@ -186,3 +186,19 @@ for the app.
     test_funcs.py:  24: return>>> None
     test.py:   4: return>>> None
     Finished run
+
+Passing Arguments to Traced Programs
+====================================
+
+The arguments to ``run`` are interpreted as a new command to be
+executed as though it was run directly, but with tracing enabled.
+
+A simple command without options can be run directly::
+
+  $ smiley run ./test.py
+
+If the command takes options, the argument parser for ``run``
+needs to be told to ignore them by using ``--`` to separate the
+command sequence from the options for ``run``::
+
+  $ smiley run -- ./test.py -e
