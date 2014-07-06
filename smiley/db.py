@@ -174,7 +174,7 @@ class DB(processor.EventProcessor):
               trace_arg, local_vars,
               timestamp):
         "Record an event during a run."
-        #LOG.debug('trace(filename=%s)', filename)
+        # LOG.debug('trace(filename=%s)', filename)
         with transaction(self.conn) as c:
             c.execute(
                 u"""
@@ -254,7 +254,7 @@ class DB(processor.EventProcessor):
     def get_file_signature(self, run_id, filename):
         """Return the file signature for the named file within the run.
         """
-        #LOG.debug('get_file_signature(%s)', filename)
+        # LOG.debug('get_file_signature(%s)', filename)
         with transaction(self.conn) as c:
             c.execute(
                 u"""
@@ -270,7 +270,7 @@ class DB(processor.EventProcessor):
                  },
             )
             row = c.fetchone()
-            #LOG.debug(' -> %s', row)
+            # LOG.debug(' -> %s', row)
             return row['signature'] if row else ''
 
     def get_files_for_run(self, run_id):

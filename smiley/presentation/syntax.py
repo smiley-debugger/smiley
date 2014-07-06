@@ -46,7 +46,7 @@ class StyledLineCache(object):
             self._files[filename] = middle_body.splitlines()
 
     def getline(self, filename, line_no):
-        #LOG.debug('getline(%s, %s)', filename, line_no)
+        # LOG.debug('getline(%s, %s)', filename, line_no)
         self._init_file(filename)
         try:
             return self._files[filename][line_no-1]

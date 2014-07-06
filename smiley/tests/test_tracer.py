@@ -60,7 +60,6 @@ class TracerTest(testtools.TestCase):
 
     def test_ignore_site_packages(self):
         t = tracer.Tracer(None, include_site_packages=False)
-        #assert False, mock.__file__
         self.assertTrue(
             t._should_ignore_file(mock.__file__),
             'should ignore %s' % mock.__file__,
