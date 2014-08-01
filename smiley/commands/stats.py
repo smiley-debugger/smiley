@@ -35,7 +35,7 @@ class StatsShow(command.Command):
         self.db = db.DB(parsed_args.database)
         run_details = self.db.get_run(parsed_args.run_id)
         if not run_details.stats:
-            print 'No profiling data was collected'
+            self.log.warning('No profiling data was collected')
         else:
             run_details.stats.sort_stats(parsed_args.sort_order)
             run_details.stats.print_stats()

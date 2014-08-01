@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import itertools
 import logging
 import os
@@ -105,4 +107,4 @@ class OutputFormatter(processor.EventProcessor):
                     self._get_display_filename(exc_file), exc_line, exc_text,
                 )
         else:
-            print 'UNHANDLED EVENT:', event
+            print('UNHANDLED EVENT:', event)
