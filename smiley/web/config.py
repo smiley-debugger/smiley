@@ -30,4 +30,12 @@ def get_config_dict(database_name, host, port):
         'smiley': {
             'database_name': database_name,
         },
+
+        'beaker': {
+            'session.type': 'cookie',
+            'session.cookie_expires': True,
+            'session.key': 'sessionkey',
+            'session.validate_key': 'cbdd663a-48f2-481c-b207-f9775af33d12',
+            '__force_dict__': True,
+        },
     }
