@@ -3,14 +3,12 @@ import cProfile
 import imp
 import inspect
 import logging
-import marshal
 import os
 import pstats
 import random
 import site
 import socket
 import sys
-import tempfile
 import time
 import uuid
 
@@ -19,6 +17,7 @@ from coverage.execfile import run_python_file
 from coverage.misc import ExceptionDuringRun
 
 import smiley
+from smiley.stats import stats_to_blob
 from smiley import uuidstack
 
 LOG = logging.getLogger(__name__)
@@ -41,11 +40,7 @@ class TracerContext(object):
 
     def get_stats_data(self):
         stats = pstats.Stats(self.profile)
-        with tempfile.TemporaryFile(mode='r+') as f:
-            marshal.dump(stats.stats, f)
-            f.flush()
-            f.seek(0)
-            return f.read()
+        return stats_to_blob(stats)
 
 
 class Tracer(object):
