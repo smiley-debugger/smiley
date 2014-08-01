@@ -84,6 +84,7 @@ ${n} = ${pformat(v, width=15)}
       <thead>
         <tr>
           <th>Location</th>
+          <th>Thread</th>
           <th>Event</th>
           <th>Statement</th>
           <th>Data</th>
@@ -104,6 +105,7 @@ older = {}
 % endif
           </td>
 
+          <td>${t.thread_id}</td>
 
 % if t.event == 'call' and t.func_name == '<module>':
           <td>module</td>
