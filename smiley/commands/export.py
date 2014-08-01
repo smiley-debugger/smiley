@@ -81,3 +81,33 @@ class Export(_ImportExportBase):
         if not dest:
             dest = parsed_args.run_id + '.db'
         self._copy_run(parsed_args.database, dest, parsed_args.run_id)
+
+
+class Import(_ImportExportBase):
+    """Import the data from one run to another database.
+    """
+
+    def get_parser(self, prog_name):
+        parser = super(Import, self).get_parser(prog_name)
+        parser.add_argument(
+            '--database',
+            nargs='?',
+            help='filename for the database, defaults to run_id + ".db"',
+        )
+        parser.add_argument(
+            'run_id',
+            help='identifier for the run',
+        )
+        parser.add_argument(
+            'destination',
+            nargs='?',
+            default='smiley.db',
+            help='filename for output, defaults (%(default)s)',
+        )
+        return parser
+
+    def take_action(self, parsed_args):
+        input = parsed_args.database
+        if not input:
+            input = parsed_args.run_id + '.db'
+        self._copy_run(input, parsed_args.destination, parsed_args.run_id)
