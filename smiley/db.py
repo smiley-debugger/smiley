@@ -103,33 +103,45 @@ class DB(processor.EventProcessor):
     """
 
     def __init__(self, name):
-        self.conn = sqlite3.connect(name)
+        self._name = name
+        self.conn = self._open_db(name)
+        return
+
+    @staticmethod
+    def _open_db(filename):
+        """Open a database using the given filename.
+        """
+        conn = sqlite3.connect(filename)
         # Use Row, instead of just lists/tuples
-        self.conn.row_factory = sqlite3.Row
+        conn.row_factory = sqlite3.Row
         # Try to select some data and create the schema if we can't.
         try:
-            cursor = self.conn.cursor()
+            cursor = conn.cursor()
             cursor.execute(u'select * from run')
             LOG.debug('database already initialized')
         except sqlite3.OperationalError:
             LOG.debug('initializing database')
             schema = pkgutil.get_data('smiley', 'schema.sql').decode('utf-8')
             cursor.executescript(schema)
-        return
+        return conn
 
     def start_run(self, run_id, cwd, description, start_time):
         "Record the beginning of a run."
         with transaction(self.conn) as c:
-            c.execute(
-                u"""
-                INSERT INTO run (id, cwd, description, start_time)
-                VALUES (:id, :cwd, :description, :start_time)
-                """,
-                {'id': run_id,
-                 'cwd': cwd,
-                 'description': jsonutil.dumps(description),
-                 'start_time': start_time}
-            )
+            try:
+                c.execute(
+                    u"""
+                    INSERT INTO run (id, cwd, description, start_time)
+                    VALUES (:id, :cwd, :description, :start_time)
+                    """,
+                    {'id': run_id,
+                     'cwd': cwd,
+                     'description': jsonutil.dumps(description),
+                     'start_time': start_time}
+                )
+            except sqlite3.IntegrityError:
+                raise ValueError('There is already a run with id %s in %s' % (
+                    run_id, self._name))
 
     def end_run(self, run_id, end_time, message, traceback, stats):
         "Record the end of a run."
