@@ -32,8 +32,20 @@ class RunController(RestController):
 
     @expose(generic=True, template='run.html')
     @nav.active_section('runs', 'details')
-    def get_one(self, run_id, page=1, per_page=20):
+    def get_one(self, run_id, page=None, per_page=None):
         run = request.db.get_run(run_id)
+
+        session = request.environ['beaker.session']
+
+        # Figure out which page and how many items to show. Look at
+        # the session first, because if we don't have valid explicit
+        # inputs we will use the session values as defaults. We track
+        # the per_page value no matter the run_id for consistency.
+        if session.get('run_id') == run_id:
+            page = page or session.get('page')
+        if page is None:
+            page = 1
+        per_page = per_page or session.get('per_page') or 20
 
         if run_id == self._cached_run_id and self._cached_trace:
             LOG.debug('using cached trace for %s', run_id)
@@ -67,4 +79,10 @@ class RunController(RestController):
                                            run_id=run_id),
         }
         context.update(page_vals)
+
+        session['run_id'] = run_id
+        session['page'] = page
+        session['per_page'] = per_page
+        session.save()
+
         return context
