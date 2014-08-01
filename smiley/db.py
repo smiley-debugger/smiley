@@ -20,7 +20,7 @@ LOG = logging.getLogger(__name__)
 
 Run = collections.namedtuple(
     'Run',
-    'id cwd description start_time end_time error_message stats',
+    'id cwd description start_time end_time error_message stats traceback',
 )
 
 
@@ -44,6 +44,7 @@ def _make_run(row):
          if row['end_time'] else None),
         row['error_message'],
         stats,
+        row['traceback'],
     )
 
 
