@@ -49,7 +49,7 @@ class TracerContext(object):
 class Tracer(object):
 
     def _canonical_path(self, path):
-        return path.rstrip(os.sep) + os.sep
+        return os.path.abspath(path.rstrip(os.sep)) + os.sep
 
     def _canonical_parent(self, filename):
         return self._canonical_path(
@@ -66,38 +66,50 @@ class Tracer(object):
         self.canonical_filenames = {}
         self.uuid_gen = uuidstack.UUIDStack()
 
-        # Build the list of paths to ignore, based on similar logic
-        # from coverage's control.py, by Ned Batchelder, et al.
-        #
-        # Look at where some standard modules are located. That's the
-        # indication for "installed with the interpreter". In some
-        # environments (virtualenv, for example), these modules may be
-        # spread across a few locations. Look at all the candidate modules
-        # we've imported, and take all the different directories.
+        # Build the list of paths to ignore or include, based on
+        # similar logic from coverage's control.py, by Ned Batchelder,
+        # et al.
+
+        # Always default to ignoring smiley and the coverage module.
         self._ignore_dirs = set()
-        # Always default to ignoring smiley and the coverage module
-        candidates = [smiley, coverage]
-        if not include_stdlib:
-            stdlibdir = self._canonical_path(os.path.join(
-                sys.prefix,
-                'lib',
-                'python%s.%s' % sys.version_info[:2],
-            ))
-            LOG.debug('ignoring stdlib %s', stdlibdir)
-            self._ignore_dirs.add(stdlibdir)
-            candidates.extend([atexit, os, random, socket, site])
-        for m in candidates:
+        for m in [smiley, coverage]:
             if hasattr(m, "__file__"):
                 to_ignore = self._canonical_parent(m.__file__)
                 LOG.debug('ignoring packages under %s based on %s',
                           to_ignore, m.__name__)
                 self._ignore_dirs.add(to_ignore)
-        LOG.debug('ignoring packages from %s', sorted(self._ignore_dirs))
 
-        # Build the list of packages we are always going to
-        # include. Since the site-packages directory is under the
-        # standard libary location, we have to handle that directory
-        # here so it is checked before the standard library location.
+        # If we are not supposed to include the stdlib, we need to
+        # look at where some standard modules are located. That's the
+        # indication for "installed with the interpreter". In some
+        # environments (virtualenv, for example), these modules may be
+        # spread across a few locations. Look at all the candidate
+        # modules we've imported, and take all the different
+        # directories.
+        self._stdlibdirs = set()
+        if not include_stdlib:
+            d = self._canonical_path(os.path.join(
+                sys.prefix,
+                'lib',
+                'python%s.%s' % sys.version_info[:2],
+            ))
+            self._stdlibdirs.add(d)
+            LOG.debug('ignoring stdlib %s', d)
+            for m in [atexit, os, random, socket, site]:
+                if hasattr(m, "__file__"):
+                    to_ignore = self._canonical_parent(m.__file__)
+                    LOG.debug('ignoring packages under %s based on %s',
+                              to_ignore, m.__name__)
+                    self._stdlibdirs.add(to_ignore)
+            LOG.debug('ignoring stdlib packages from %s',
+                      sorted(self._stdlibdirs))
+        else:
+            LOG.debug('including stdlib')
+
+        # If the user wants us to include some specific packages, find
+        # them so we can include those directories even if they are
+        # under the stdlib or site-packages, which we might be
+        # ignoring separately.
         self._include_packages = set()
         for name in include_packages:
             try:
@@ -111,6 +123,12 @@ class Tracer(object):
                 to_include = self._canonical_parent(filename)
                 LOG.debug('including packages under %s', to_include)
                 self._include_packages.add(to_include)
+        LOG.debug('including packages from %s', sorted(self._include_packages))
+
+        # Since the site-packages directory is under the standard
+        # library location, we have to handle that directory here so
+        # it can be checked separately from the standard library
+        # location.
         if include_site_packages:
             # Use a package we know we require (so it is likely to be
             # installed) but is not smiley (which will not work in a
@@ -120,8 +138,9 @@ class Tracer(object):
                 self._canonical_parent(cliff.__file__)
             )
             LOG.debug('including site-packages %s', site_packages)
-            self._include_packages.add(site_packages)
-        LOG.debug('including packages from %s', sorted(self._include_packages))
+            self._sitepkgdir = site_packages
+        else:
+            self._sitepkgdir = None
 
     def _get_interesting_locals(self, frame):
         return {
@@ -140,18 +159,35 @@ class Tracer(object):
     def _should_ignore_file(self, filename):
         # FIXME: Need to add the ability to explicitly not ignore some
         # things in the stdlib to trace into dependencies.
+        # LOG.debug('_should_ignore_file(%s)', filename)
         if not filename:
             return True
         if filename.endswith('>'):
             # builtins?
+            # LOG.debug('ignoring builtin %s', filename)
             return True
         filename = os.path.realpath(filename)
         for d in self._include_packages:
+            # LOG.debug('checking include package %s', d)
             if filename.startswith(d):
+                # LOG.debug('including package %s', filename)
                 return False
         for d in self._ignore_dirs:
+            # LOG.debug('checking ignore directory %s', d)
             if filename.startswith(d):
+                # LOG.debug('ignoring package %s', filename)
                 return True
+        if self._sitepkgdir:
+            # LOG.debug('checking site-packages %s', self._sitepkgdir)
+            if filename.startswith(self._sitepkgdir):
+                # LOG.debug('including %s', filename)
+                return False
+        for d in self._stdlibdirs:
+            # LOG.debug('checking stdlib %s', d)
+            if filename.startswith(d):
+                # LOG.debug('ignoring stdlib %s', filename)
+                return True
+        # LOG.debug('defaulting to including %s', filename)
         return False
 
     def _send_notice(self, thread_id, frame, event, arg, call_id):

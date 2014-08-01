@@ -1,11 +1,16 @@
 import atexit
+import logging
 import os
 import site
 
+import coverage
 import mock
 import testtools
 
 from smiley import tracer
+
+
+LOG = logging.getLogger(__name__)
 
 
 class TracerTest(testtools.TestCase):
@@ -37,10 +42,13 @@ class TracerTest(testtools.TestCase):
 
     def test_ignore_stdlib(self):
         t = tracer.Tracer(None, include_stdlib=False)
+        os_path = os.path.abspath(os.__file__)
+        LOG.debug('checking %s', os_path)
         self.assertIn(
-            os.path.dirname(os.__file__) + os.sep,
-            t._ignore_dirs,
+            os.path.dirname(os_path) + os.sep,
+            t._stdlibdirs,
         )
+        LOG.debug('checking %s', os.__file__)
         self.assertTrue(
             t._should_ignore_file(os.__file__),
             'should ignore %s' % os.__file__,
@@ -50,9 +58,13 @@ class TracerTest(testtools.TestCase):
         t = tracer.Tracer(None, include_stdlib=True)
         self.assertFalse(t._should_ignore_file(site.__file__))
 
-    def test_ignore_smiley(self):
+    def test_ignore_smiley_by_default(self):
         t = tracer.Tracer(None)
         self.assertTrue(t._should_ignore_file(tracer.__file__))
+
+    def test_ignore_coverage_by_default(self):
+        t = tracer.Tracer(None)
+        self.assertTrue(t._should_ignore_file(coverage.__file__))
 
     def test_include_smiley(self):
         t = tracer.Tracer(None, include_packages=['smiley'])
