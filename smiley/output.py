@@ -69,7 +69,7 @@ class OutputFormatter(processor.EventProcessor):
         if message:
             self.log.info('ERROR in app: %s', message)
 
-    def trace(self, run_id, event,
+    def trace(self, run_id, thread_id, event,
               func_name, line_no, filename,
               trace_arg, local_vars,
               timestamp):
@@ -80,9 +80,10 @@ class OutputFormatter(processor.EventProcessor):
         display_filename = self._get_display_filename(filename)
         if event in ('line', 'call'):
             self.log.info(
-                '%s:%4s: %s',
+                '%s:%4s:%s: %s',
                 display_filename,
                 line_no,
+                thread_id,
                 line,
             )
             if local_vars:

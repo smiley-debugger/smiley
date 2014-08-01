@@ -154,6 +154,7 @@ class TraceTest(testtools.TestCase):
         self.trace_arg = [{'complex': 'value'}]
         self.db.trace(
             run_id='12345',
+            thread_id='t1',
             call_id='abcd',
             event='test',
             func_name='test_trace',
@@ -165,6 +166,7 @@ class TraceTest(testtools.TestCase):
         )
         self.db.trace(
             run_id='12345',
+            thread_id='t1',
             call_id='abcd',
             event='test',
             func_name='test_trace',
@@ -213,6 +215,7 @@ class QueryTest(testtools.TestCase):
         self.trace_arg = [{'complex': 'value'}]
         self.db.trace(
             run_id='12345',
+            thread_id='t1',
             call_id='abcd',
             event='test',
             func_name='test_trace',
@@ -224,6 +227,7 @@ class QueryTest(testtools.TestCase):
         )
         self.db.trace(
             run_id='12345',
+            thread_id='t1',
             call_id='abcd',
             event='test',
             func_name='test_trace',

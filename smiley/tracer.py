@@ -9,6 +9,7 @@ import random
 import site
 import socket
 import sys
+import threading
 import time
 import uuid
 
@@ -32,10 +33,12 @@ class TracerContext(object):
     def __enter__(self):
         self.profile.enable()
         sys.settrace(self.tracer.trace_calls)
+        threading.settrace(self.tracer.trace_calls)
         return self
 
     def __exit__(self, *args):
         sys.settrace(None)
+        threading.settrace(None)
         self.profile.disable()
 
     def get_stats_data(self):
@@ -151,7 +154,7 @@ class Tracer(object):
                 return True
         return False
 
-    def _send_notice(self, frame, event, arg, call_id):
+    def _send_notice(self, thread_id, frame, event, arg, call_id):
         co = frame.f_code
         func_name = co.co_name
         line_no = frame.f_lineno
@@ -162,6 +165,7 @@ class Tracer(object):
         interesting_locals = self._get_interesting_locals(frame)
         self.publisher.trace(
             run_id=self.run_id,
+            thread_id=thread_id,
             call_id=call_id,
             event=event,
             func_name=func_name,
@@ -191,7 +195,8 @@ class Tracer(object):
             call_id = self.uuid_gen.pop()
         else:
             call_id = self.uuid_gen.top()
-        self._send_notice(frame, event, arg, call_id)
+        thread_id = threading.currentThread().name
+        self._send_notice(thread_id, frame, event, arg, call_id)
         return self.trace_calls
 
     def run(self, command_line):

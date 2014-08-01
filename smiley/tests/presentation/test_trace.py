@@ -11,6 +11,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -23,6 +24,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -35,6 +37,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -55,6 +58,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -67,6 +71,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -79,6 +84,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -99,6 +105,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='call',
                 filename='filename.py',
@@ -111,6 +118,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -123,6 +131,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -135,6 +144,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='return',
                 filename='filename.py',
@@ -157,6 +167,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -171,6 +182,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -194,6 +206,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -209,6 +222,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -235,6 +249,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -250,6 +265,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -269,6 +285,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='call',
                 filename='filename.py',
@@ -281,6 +298,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',
@@ -295,6 +313,7 @@ class CollapseTraceTest(testtools.TestCase):
             db.Trace(
                 id='1',
                 run_id='1',
+                thread_id='t1',
                 call_id='1',
                 event='line',
                 filename='filename.py',

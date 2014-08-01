@@ -19,6 +19,7 @@ create table trace (
     id integer primary key autoincrement not null,
     run_id text not null references run(id),
 
+    thread_id text, -- separate calls from different threads
     call_id text, -- might be null for code outside a function
     
     event text not null,  -- the type of event that happened

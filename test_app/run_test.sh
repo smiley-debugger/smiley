@@ -1,3 +1,3 @@
 #!/bin/sh
 
-smiley run --local --database ../smiley.db -- test.py $@
+smiley --debug -v run --local --database ../smiley.db -- test.py $@

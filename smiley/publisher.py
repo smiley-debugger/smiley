@@ -19,6 +19,8 @@ class Publisher(processor.EventProcessor):
         self.pub_socket.hwm = high_water_mark
 
     def _send(self, msg_type, data):
+        # FIXME: Need to replace the thread trace func, too?
+        # FIXME: Need to disable the profiler?
         old_trace = None
         try:
             old_trace = sys.gettrace()
@@ -58,7 +60,7 @@ class Publisher(processor.EventProcessor):
              },
         )
 
-    def trace(self, run_id, call_id, event,
+    def trace(self, run_id, thread_id, call_id, event,
               func_name, line_no, filename,
               trace_arg, local_vars,
               timestamp):
@@ -74,4 +76,5 @@ class Publisher(processor.EventProcessor):
              'timestamp': timestamp,
              'run_id': run_id,
              'call_id': call_id,
+             'thread_id': thread_id,
              })

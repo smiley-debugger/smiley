@@ -20,7 +20,7 @@ class EventProcessor(object):
         """
 
     @abc.abstractmethod
-    def trace(self, run_id, event,
+    def trace(self, run_id, thread_id, event,
               func_name, line_no, filename,
               trace_arg, local_vars,
               timestamp):

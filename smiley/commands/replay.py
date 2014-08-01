@@ -44,6 +44,7 @@ class Replay(command.Command):
         for t in self.db.get_trace(parsed_args.run_id):
             self.out.trace(
                 t.run_id,
+                t.thread_id,
                 t.event,
                 t.func_name,
                 t.line_no,

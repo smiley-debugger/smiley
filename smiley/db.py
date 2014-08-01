@@ -64,7 +64,7 @@ def _make_file(row):
 
 Trace = collections.namedtuple(
     'Trace',
-    ' '.join(['id', 'run_id', 'call_id', 'event',
+    ' '.join(['id', 'run_id', 'thread_id', 'call_id', 'event',
               'filename', 'line_no', 'func_name',
               'trace_arg', 'local_vars',
               'timestamp'])
@@ -75,6 +75,7 @@ def _make_trace(row):
     return Trace(
         id=row['id'],
         run_id=row['run_id'],
+        thread_id=row['thread_id'],
         call_id=row['call_id'],
         event=row['event'],
         filename=row['filename'],
@@ -182,7 +183,7 @@ class DB(processor.EventProcessor):
             )
             return _make_run(c.fetchone())
 
-    def trace(self, run_id, call_id, event,
+    def trace(self, run_id, thread_id, call_id, event,
               func_name, line_no, filename,
               trace_arg, local_vars,
               timestamp):
@@ -192,17 +193,18 @@ class DB(processor.EventProcessor):
             c.execute(
                 u"""
                 INSERT INTO trace
-                (run_id, call_id, event,
+                (run_id, thread_id, call_id, event,
                  func_name, line_no, filename,
                  trace_arg, local_vars,
                  timestamp)
                 VALUES
-                (:run_id, :call_id, :event,
+                (:run_id, :thread_id, :call_id, :event,
                  :func_name, :line_no, :filename,
                  :trace_arg, :local_vars,
                  :timestamp)
                 """,
                 {'run_id': run_id,
+                 'thread_id': thread_id,
                  'call_id': call_id,
                  'event': event,
                  'func_name': func_name,

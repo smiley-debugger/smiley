@@ -9,6 +9,7 @@ LOG = logging.getLogger(__name__)
 def collapse_trace(trace_iter):
     """Combine closely related trace items.
     """
+    # FIXME: Need to look at the thread id
     accumulate = None
     for t in trace_iter:
         vars_have_changed = False
@@ -42,6 +43,7 @@ def collapse_trace(trace_iter):
             accumulate = db.Trace(
                 id=t.id,
                 run_id=t.run_id,
+                thread_id=t.thread_id,
                 call_id=t.call_id,
                 event=t.event,
                 filename=t.filename,
@@ -58,6 +60,7 @@ def collapse_trace(trace_iter):
             accumulate = db.Trace(
                 id=accumulate.id,
                 run_id=accumulate.run_id,
+                thread_id=t.thread_id,
                 call_id=accumulate.call_id,
                 event=accumulate.event,
                 filename=accumulate.filename,
