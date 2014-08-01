@@ -57,4 +57,5 @@ class Replay(command.Command):
             run_details.end_time,
             run_details.error_message,
             None,  # run_details.traceback,
+            None,  # stats
         )
