@@ -87,6 +87,20 @@ def _make_trace(row):
     )
 
 
+Thread = collections.namedtuple(
+    'Thread',
+    ' '.join(['id', 'start_time', 'end_time'])
+)
+
+
+def _make_thread(row):
+    return Thread(
+        id=row['thread_id'],
+        start_time=datetime.datetime.fromtimestamp(row['start_time']),
+        end_time=datetime.datetime.fromtimestamp(row['end_time']),
+    )
+
+
 @contextlib.contextmanager
 def transaction(conn):
     c = conn.cursor()
@@ -182,6 +196,21 @@ class DB(processor.EventProcessor):
                 {'run_id': run_id},
             )
             return _make_run(c.fetchone())
+
+    def get_thread_details(self, run_id):
+        "Return the names of the threads used in the run."
+        with transaction(self.conn) as c:
+            c.execute(
+                u"""
+                SELECT thread_id, MIN(timestamp) AS start_time,
+                       MAX(timestamp) AS end_time
+                FROM trace
+                WHERE run_id = :run_id
+                GROUP BY thread_id
+                """,
+                {'run_id': run_id},
+            )
+            return (_make_thread(r) for r in c.fetchall())
 
     def trace(self, run_id, thread_id, call_id, event,
               func_name, line_no, filename,

@@ -1,3 +1,4 @@
+import datetime
 import fixtures
 import json
 import testtools
@@ -281,6 +282,40 @@ class QueryTest(testtools.TestCase):
         self.assertEqual(len(trace), 2)
         line_nos = [r.line_no for r in trace]
         self.assertEqual(line_nos, [99, 100])
+
+    def test_get_thread_details(self):
+        self.db.trace(
+            run_id='12345',
+            thread_id='t2',
+            call_id='abcd',
+            event='test',
+            func_name='test_trace',
+            line_no=99,
+            filename='test_db.py',
+            trace_arg=self.trace_arg,
+            local_vars=self.local_values,
+            timestamp=1370436104.65,
+        )
+        self.db.trace(
+            run_id='12345',
+            thread_id='t2',
+            call_id='abcd',
+            event='test',
+            func_name='test_trace',
+            line_no=100,
+            filename='test_db.py',
+            trace_arg=self.trace_arg,
+            local_vars=self.local_values,
+            timestamp=1370436106.65,
+        )
+        details = list(self.db.get_thread_details('12345'))
+        by_id = {t.id: t for t in details}
+        thread_ids = set(by_id.keys())
+        self.assertEqual(thread_ids, set(['t1', 't2']))
+        self.assertEqual(by_id['t2'].start_time,
+                         datetime.datetime.fromtimestamp(1370436104.65))
+        self.assertEqual(by_id['t2'].end_time,
+                         datetime.datetime.fromtimestamp(1370436106.65))
 
 
 class FileCacheTest(testtools.TestCase):
