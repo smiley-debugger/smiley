@@ -245,13 +245,25 @@ class DB(processor.EventProcessor):
                  }
             )
 
-    def get_trace(self, run_id):
+    def get_trace(self, run_id, thread_id=None):
         "Return the run data."
         with transaction(self.conn) as c:
-            c.execute(
-                u"SELECT * FROM trace WHERE run_id = :run_id ORDER BY id",
-                {'run_id': run_id},
-            )
+            if thread_id:
+                c.execute(
+                    u"""
+                    SELECT *
+                    FROM trace
+                    WHERE run_id = :run_id
+                    AND thread_id = :thread_id
+                    ORDER BY id
+                    """,
+                    {'run_id': run_id, 'thread_id': thread_id},
+                )
+            else:
+                c.execute(
+                    u"SELECT * FROM trace WHERE run_id = :run_id ORDER BY id",
+                    {'run_id': run_id},
+                )
             return (_make_trace(t)
                     for t in c.fetchall())
 

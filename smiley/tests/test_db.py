@@ -283,7 +283,45 @@ class QueryTest(testtools.TestCase):
         line_nos = [r.line_no for r in trace]
         self.assertEqual(line_nos, [99, 100])
 
-    def test_get_thread_details(self):
+
+class ThreadQueryTest(testtools.TestCase):
+
+    def setUp(self):
+        super(ThreadQueryTest, self).setUp()
+        self.useFixture(fixtures.FakeLogger())
+        self.db = db.DB(':memory:')
+        self.db.start_run(
+            '12345',
+            '/no/such/dir',
+            ['command', 'line', 'would', 'go', 'here'],
+            1370436103.65,
+        )
+        self.local_values = {'name': ['value', 'pairs']}
+        self.trace_arg = [{'complex': 'value'}]
+        self.db.trace(
+            run_id='12345',
+            thread_id='t1',
+            call_id='abcd',
+            event='test',
+            func_name='test_trace',
+            line_no=99,
+            filename='test_db.py',
+            trace_arg=self.trace_arg,
+            local_vars=self.local_values,
+            timestamp=1370436104.65,
+        )
+        self.db.trace(
+            run_id='12345',
+            thread_id='t1',
+            call_id='abcd',
+            event='test',
+            func_name='test_trace',
+            line_no=100,
+            filename='test_db.py',
+            trace_arg=self.trace_arg,
+            local_vars=self.local_values,
+            timestamp=1370436104.65,
+        )
         self.db.trace(
             run_id='12345',
             thread_id='t2',
@@ -308,14 +346,43 @@ class QueryTest(testtools.TestCase):
             local_vars=self.local_values,
             timestamp=1370436106.65,
         )
+        self.db.start_run(
+            '6789',
+            '/no/such/dir',
+            ['command', 'line', 'would', 'go', 'here'],
+            1370436104.65,
+        )
+        self.db.end_run(
+            '6789',
+            1370436105.65,
+            'error message',
+            None,
+            stats=None,
+        )
+
+    def test_get_thread_details_all_thread(self):
         details = list(self.db.get_thread_details('12345'))
         by_id = {t.id: t for t in details}
         thread_ids = set(by_id.keys())
         self.assertEqual(thread_ids, set(['t1', 't2']))
+
+    def test_get_thread_details_start_and_end(self):
+        details = list(self.db.get_thread_details('12345'))
+        by_id = {t.id: t for t in details}
         self.assertEqual(by_id['t2'].start_time,
                          datetime.datetime.fromtimestamp(1370436104.65))
         self.assertEqual(by_id['t2'].end_time,
                          datetime.datetime.fromtimestamp(1370436106.65))
+
+    def test_get_trace_no_thread(self):
+        trace = list(self.db.get_trace('12345'))
+        self.assertEqual(len(trace), 4)
+
+    def test_get_trace_with_thread(self):
+        trace = list(self.db.get_trace('12345', 't1'))
+        self.assertEqual(len(trace), 2)
+        ids = set(t.thread_id for t in trace)
+        self.assertEqual(ids, set(['t1']))
 
 
 class FileCacheTest(testtools.TestCase):
