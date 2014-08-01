@@ -27,16 +27,20 @@ ${n} = ${pformat(v, width=15)}
 % endfor
 </%def>
 
-<%def name="page_link(page, per_page)">
+<%def name="page_link(page, per_page, thread_id=None)">
+% if thread_id is not None:
+/runs/${run_id}?page=${page}&per_page=${per_page}&thread_id=${thread_id}
+% else:
 /runs/${run_id}?page=${page}&per_page=${per_page}
+% endif
 </%def>
 
 <%def name="pagination(page, num_pages, per_page)">
 <ul class="pagination">
 % if page <= 1:
-  <li class="disabled"><a href="${page_link(1, per_page)}">&laquo;</a></li>
+  <li class="disabled"><a href="${page_link(1, per_page, thread_id)}">&laquo;</a></li>
 % else:
-  <li><a href="${page_link(page-1, per_page)}">&laquo;</a></li>
+  <li><a href="${page_link(page-1, per_page, thread_id)}">&laquo;</a></li>
 % endif
 % for r in page_ranges:
 % for p in range(r[0], r[1]+1):
@@ -44,16 +48,16 @@ ${n} = ${pformat(v, width=15)}
 % if p == page:
  class="active"
 % endif
-><a href="${page_link(p, per_page)}">${p}</a></li>
+><a href="${page_link(p, per_page, thread_id)}">${p}</a></li>
 % endfor
 % if len(page_ranges) > 1 and r != page_ranges[-1]:
     <li class="disabled"><a>...</a></li>
 % endif
 % endfor
 % if page >= num_pages:
-  <li class="disabled"><a href="${page_link(num_pages, per_page)}">&raquo;</a></li>
+  <li class="disabled"><a href="${page_link(num_pages, per_page, thread_id)}">&raquo;</a></li>
 % else:
-  <li><a href="${page_link(page+1, per_page)}">&raquo;</a></li>
+  <li><a href="${page_link(page+1, per_page, thread_id)}">&raquo;</a></li>
 % endif
 </ul>
 </%def>
@@ -63,20 +67,49 @@ ${n} = ${pformat(v, width=15)}
     ${pagination(page, num_pages, per_page)}
   </div>
 
-  <div class="col-md-4 col-md-offset-2">
-    <div id="per-page-selector" class="btn-group">
-    % for n in [5, 10, 20, 50, 100]:
-      <a
-         % if n == per_page:
-         class="btn btn-primary" 
-         % else:
-         class="btn btn-default" 
-         % endif
-         href="${page_link(1, n)}">${n}</a>
-    % endfor
-    </div>
+  <div class="col-md-6">
+    <form role="form">
+      <div class="form-group">
+        <label for="per-page-selector">Items Per Page</label>
+        <div id="per-page-selector" class="btn-group">
+          % for n in [5, 10, 20, 50, 100]:
+          <a
+             % if n == per_page:
+             class="btn btn-primary" 
+             % else:
+             class="btn btn-default" 
+             % endif
+             href="${page_link(1, n, thread_id)}">${n}</a>
+          % endfor
+        </div>
+      </div>
+
+% if len(thread_details) > 1:
+      <div class="form-group">
+        <label for="thread-filter">Filter on</label>
+        <span id="thread-filter" class="dropdown">
+          <button class="btn btn-default dropdown-toggle" type="button" id="thread-menu" data-toggle="dropdown">
+            % if thread_id is not None:
+            ${thread_id}
+            % else:
+            All Threads
+            % endif
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="thread-menu">
+            <li role="presentation"><a role="menuitem" href="${page_link(page, per_page, '')}">All Threads</a>
+              % for t in thread_details:
+            <li role="presentation"><a role="menuitem" href="${page_link(page, per_page, t.id)}">${t.id}</a></li>
+            % endfor
+          </ul>
+        </div>
+      </span>
+% endif
+
   </div>
+
 </div>
+
 
 <div class="row">
   <div id="content" class="col-md-12">
@@ -84,7 +117,9 @@ ${n} = ${pformat(v, width=15)}
       <thead>
         <tr>
           <th>Location</th>
+% if len(thread_details) > 1:
           <th>Thread</th>
+% endif
           <th>Event</th>
           <th>Statement</th>
           <th>Data</th>
@@ -105,7 +140,9 @@ older = {}
 % endif
           </td>
 
+% if len(thread_details) > 1:
           <td>${t.thread_id}</td>
+% endif
 
 % if t.event == 'call' and t.func_name == '<module>':
           <td>module</td>

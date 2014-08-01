@@ -19,7 +19,7 @@ class RunController(RestController):
     files = files.FileController()
     stats = stats.StatsController()
 
-    _cached_run_id = None
+    _cached_ids = (None, None)
     _cached_trace = None
 
     @expose(generic=True, template='runs.html')
@@ -32,7 +32,7 @@ class RunController(RestController):
 
     @expose(generic=True, template='run.html')
     @nav.active_section('runs', 'details')
-    def get_one(self, run_id, page=None, per_page=None):
+    def get_one(self, run_id, page=None, per_page=None, thread_id=None):
         run = request.db.get_run(run_id)
 
         session = request.environ['beaker.session']
@@ -43,19 +43,30 @@ class RunController(RestController):
         # the per_page value no matter the run_id for consistency.
         if session.get('run_id') == run_id:
             page = page or session.get('page')
+            # Use the thread_id from the session if one has not been
+            # provided as an explicit argument.
+            if thread_id is None:
+                thread_id = session.get('thread_id')
         if page is None:
             page = 1
         per_page = per_page or session.get('per_page') or 20
 
-        if run_id == self._cached_run_id and self._cached_trace:
+        # We can't pass None easily, so we pass an empty string when
+        # we want to force all threads. None means no value was
+        # passed, so we try to find the previous value from the
+        # session (above) and fall back to None if there is no setting
+        # in the session.
+        thread_id = thread_id or None
+
+        if (run_id, thread_id) == self._cached_ids and self._cached_trace:
             LOG.debug('using cached trace for %s', run_id)
             trace_data = self._cached_trace
         else:
             LOG.debug('computing trace for %s', run_id)
             trace_data = list(
-                trace.collapse_trace(request.db.get_trace(run_id))
+                trace.collapse_trace(request.db.get_trace(run_id, thread_id))
             )
-            self._cached_run_id = run_id
+            self._cached_ids = (run_id, thread_id)
             self._cached_trace = trace_data
         syntax_line_cache = syntax.StyledLineCache(request.db, run_id)
 
@@ -65,6 +76,8 @@ class RunController(RestController):
         start = page_vals['start']
         end = page_vals['end']
 
+        thread_details = list(request.db.get_thread_details(run_id))
+
         def getlines(filename, nums):
             start, end = nums
             return syntax_line_cache.getlines(filename, start, end,
@@ -72,7 +85,9 @@ class RunController(RestController):
 
         context = {
             'run_id': run_id,
+            'thread_id': thread_id,
             'run': run,
+            'thread_details': thread_details,
             'trace': trace_data[start:end],
             'getlines': getlines,
             'getfileid': functools.partial(request.db.get_file_signature,
@@ -81,6 +96,7 @@ class RunController(RestController):
         context.update(page_vals)
 
         session['run_id'] = run_id
+        session['thread_id'] = thread_id
         session['page'] = page
         session['per_page'] = per_page
         session.save()
