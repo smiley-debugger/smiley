@@ -28,9 +28,9 @@ def format_dictionary(d):
     return x.get_string(fields=('Variable', 'Value'))
 
 
-def dump_table(formatted, write, indent=0):
+def dump_table(formatted, write, indent=4):
     # Use the write function we're given, one line at a time.
-    indent_spaces = ' ' * 4
+    indent_spaces = ' ' * indent
     for line in formatted.splitlines():
         write(indent_spaces + line)
     return
