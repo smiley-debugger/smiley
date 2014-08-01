@@ -1,0 +1,32 @@
+<%inherit file="run_base.html" />
+
+<%block name="breadcrumbs">
+<li><a href="/runs">Runs</a></li>
+<li><a href="/runs/${run_id}">${run_id}</a></li>
+<li class="active">Threads</li>
+</%block>
+
+<div class="row">
+  <div id="content" class="col-md-12">
+
+    <table class="table table-striped table-condensed">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Start</th>
+          <th>End</th>
+        </tr>
+      </thead>
+      <tbody>
+% for t in thread_details:
+        <tr>
+          <td>${t.id}</td>
+          <td>${t.start_time}</td>
+          <td>${t.end_time}</td>
+        </tr>
+% endfor
+      </tbody>
+    </table>
+
+  </div>
+</div>

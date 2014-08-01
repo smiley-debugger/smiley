@@ -10,6 +10,8 @@ from smiley.presentation import trace
 from smiley.web import nav
 from smiley.web.controllers import files
 from smiley.web.controllers import stats
+from smiley.web.controllers import run_context
+from smiley.web.controllers import threads as thread_controller
 
 LOG = logging.getLogger(__name__)
 
@@ -18,6 +20,7 @@ class RunController(RestController):
 
     files = files.FileController()
     stats = stats.StatsController()
+    threads = thread_controller.ThreadController()
 
     _cached_ids = (None, None)
     _cached_trace = None
@@ -33,8 +36,6 @@ class RunController(RestController):
     @expose(generic=True, template='run.html')
     @nav.active_section('runs', 'details')
     def get_one(self, run_id, page=None, per_page=None, thread_id=None):
-        run = request.db.get_run(run_id)
-
         session = request.environ['beaker.session']
 
         # Figure out which page and how many items to show. Look at
@@ -76,23 +77,18 @@ class RunController(RestController):
         start = page_vals['start']
         end = page_vals['end']
 
-        thread_details = list(request.db.get_thread_details(run_id))
-
         def getlines(filename, nums):
             start, end = nums
             return syntax_line_cache.getlines(filename, start, end,
                                               include_comments=True)
 
-        context = {
-            'run_id': run_id,
-            'thread_id': thread_id,
-            'run': run,
-            'thread_details': thread_details,
+        context = run_context.get_context(request.db, run_id, thread_id)
+        context.update({
             'trace': trace_data[start:end],
             'getlines': getlines,
             'getfileid': functools.partial(request.db.get_file_signature,
                                            run_id=run_id),
-        }
+        })
         context.update(page_vals)
 
         session['run_id'] = run_id
