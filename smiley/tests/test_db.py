@@ -374,6 +374,12 @@ class ThreadQueryTest(testtools.TestCase):
         self.assertEqual(by_id['t2'].end_time,
                          datetime.datetime.fromtimestamp(1370436106.65))
 
+    def test_get_thread_details_num_events(self):
+        details = list(self.db.get_thread_details('12345'))
+        by_id = {t.id: t for t in details}
+        self.assertEqual(by_id['t1'].num_events, 2)
+        self.assertEqual(by_id['t2'].num_events, 2)
+
     def test_get_trace_no_thread(self):
         trace = list(self.db.get_trace('12345'))
         self.assertEqual(len(trace), 4)
