@@ -9,6 +9,8 @@ import pkg_resources
 
 class Smiley(app.App):
 
+    CONSOLE_MESSAGE_FORMAT = 'smiley: %(message)s'
+
     log = logging.getLogger(__name__)
 
     def __init__(self):
