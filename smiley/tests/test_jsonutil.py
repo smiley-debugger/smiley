@@ -24,10 +24,8 @@ class JSONTest(testtools.TestCase):
         self.assertEqual(actual, expected)
 
     def test_exception(self):
-        try:
-            raise RuntimeError('here')
-        except RuntimeError as err:
-            actual = jsonutil._json_special_types(err)
+        err = RuntimeError('here')
+        actual = jsonutil._json_special_types(err)
         if six.PY3:
             expected = {
                 '__class__': 'RuntimeError',
@@ -39,6 +37,23 @@ class JSONTest(testtools.TestCase):
                 '__class__': 'RuntimeError',
                 '__module__': 'exceptions',
                 'args': ('here',),
+            }
+        self.assertEqual(actual, expected)
+
+    def test_exception_with_complex_object(self):
+        err = RuntimeError(self)
+        actual = jsonutil._json_special_types(err)
+        if six.PY3:
+            expected = {
+                '__class__': 'RuntimeError',
+                '__module__': 'builtins',
+                'args': (self,),
+            }
+        else:
+            expected = {
+                '__class__': 'RuntimeError',
+                '__module__': 'exceptions',
+                'args': (self,),
             }
         self.assertEqual(actual, expected)
 
@@ -68,4 +83,9 @@ class JSONTest(testtools.TestCase):
             'b': 'B',
         }
         actual = jsonutil._json_special_types(Foo())
+        self.assertEqual(actual, expected)
+
+    def test_type(self):
+        expected = "<type 'int'>"
+        actual = jsonutil._json_special_types(int)
         self.assertEqual(actual, expected)
