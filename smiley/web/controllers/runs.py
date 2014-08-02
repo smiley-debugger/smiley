@@ -11,6 +11,7 @@ from smiley.web import nav
 from smiley.web.controllers import files
 from smiley.web.controllers import stats
 from smiley.web.controllers import run_context
+from smiley.web.controllers.session import get_session
 from smiley.web.controllers import threads as thread_controller
 
 LOG = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ class RunController(RestController):
     @expose(generic=True, template='run.html')
     @nav.active_section('runs', 'details')
     def get_one(self, run_id, page=None, per_page=None, thread_id=None):
-        session = request.environ['beaker.session']
+        session = get_session()
 
         # Figure out which page and how many items to show. Look at
         # the session first, because if we don't have valid explicit

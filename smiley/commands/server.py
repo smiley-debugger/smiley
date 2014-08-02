@@ -4,6 +4,7 @@ from wsgiref import simple_server
 from beaker.middleware import SessionMiddleware
 from cliff import command
 from pecan import load_app
+import six
 
 from smiley.web import config as web_config
 
@@ -47,7 +48,8 @@ class Server(command.Command):
 
         # Add beaker session middleware so we can track where the user
         # is and navigate back to the same place as they change tabs.
-        app = SessionMiddleware(app, config_data['beaker'])
+        if six.PY2:
+            app = SessionMiddleware(app, config_data['beaker'])
 
         host = config_data['server']['host']
         port = int(config_data['server']['port'])
