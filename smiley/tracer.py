@@ -96,7 +96,7 @@ class Tracer(object):
             ))
             self._stdlibdirs.add(d)
             LOG.debug('ignoring stdlib %s', d)
-            for m in [atexit, os, random, socket, site]:
+            for m in [atexit, os, random, socket, site, threading]:
                 if hasattr(m, "__file__"):
                     to_ignore = self._canonical_parent(m.__file__)
                     LOG.debug('ignoring packages under %s based on %s',
