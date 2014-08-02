@@ -3,6 +3,7 @@ import json
 import logging
 import traceback
 import types
+import xml.dom.minidom
 
 from cliff import commandmanager
 
@@ -13,6 +14,7 @@ _CIRCULAR_TYPES = (
     logging.Logger,
     types.ModuleType,
     argparse.ArgumentParser,
+    xml.dom.minidom.Document,
 )
 
 
