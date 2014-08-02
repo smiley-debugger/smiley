@@ -27,4 +27,5 @@ class Threads(lister.Lister):
     def take_action(self, parsed_args):
         self.db = db.DB(parsed_args.database)
         threads = list(self.db.get_thread_details(parsed_args.run_id))
-        return (('ID', 'Start', 'End', 'Num Events'), threads)
+        return (('ID', 'Start', 'End', 'Num Events', 'Num Locations'),
+                threads)

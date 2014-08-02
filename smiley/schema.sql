@@ -21,7 +21,7 @@ create table trace (
 
     thread_id text, -- separate calls from different threads
     call_id text, -- might be null for code outside a function
-    
+
     event text not null,  -- the type of event that happened
 
     -- where the event happened
@@ -32,6 +32,16 @@ create table trace (
     local_vars text,  -- json-encoded dict
     timestamp int
 );
+
+-- a view to help produce the counts of the unique locations executed by a thread
+CREATE VIEW IF NOT EXISTS location_counts AS
+SELECT run_id, thread_id, COUNT(*) as num_locations
+FROM (SELECT DISTINCT run_id, thread_id, filename,
+      line_no AS location
+      FROM trace)
+GROUP BY run_id, thread_id
+;
+
 
 create index if not exists trace_run_id_idx on trace (run_id);
 

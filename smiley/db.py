@@ -89,7 +89,7 @@ def _make_trace(row):
 
 Thread = collections.namedtuple(
     'Thread',
-    ' '.join(['id', 'start_time', 'end_time', 'num_events'])
+    ' '.join(['id', 'start_time', 'end_time', 'num_events', 'num_locations'])
 )
 
 
@@ -99,6 +99,7 @@ def _make_thread(row):
         start_time=datetime.datetime.fromtimestamp(row['start_time']),
         end_time=datetime.datetime.fromtimestamp(row['end_time']),
         num_events=row['num_events'],
+        num_locations=row['num_locations'],
     )
 
 
@@ -203,12 +204,17 @@ class DB(processor.EventProcessor):
         with transaction(self.conn) as c:
             c.execute(
                 u"""
-                SELECT thread_id, MIN(timestamp) AS start_time,
+                SELECT trace.run_id, trace.thread_id,
+                       MIN(timestamp) AS start_time,
                        MAX(timestamp) AS end_time,
-                       COUNT(id) AS num_events
+                       COUNT(trace.id) AS num_events,
+                       location_counts.num_locations AS num_locations
                 FROM trace
-                WHERE run_id = :run_id
-                GROUP BY thread_id
+                    JOIN location_counts
+                    ON trace.run_id = location_counts.run_id
+                        AND trace.thread_id = location_counts.thread_id
+                WHERE trace.run_id = :run_id
+                GROUP BY trace.thread_id
                 """,
                 {'run_id': run_id},
             )
