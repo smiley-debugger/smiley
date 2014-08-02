@@ -1,7 +1,8 @@
 import logging
-
-import zmq
 import sys
+
+import six
+import zmq
 
 from smiley import jsonutil
 from smiley import processor
@@ -15,7 +16,7 @@ class Publisher(processor.EventProcessor):
         self.context = zmq.Context()
         self.pub_socket = self.context.socket(zmq.PUSH)
         self.pub_socket.bind(endpoint)
-        self.pub_socket.identity = 'publisher'
+        self.pub_socket.identity = six.b('publisher')
         self.pub_socket.hwm = high_water_mark
 
     def _send(self, msg_type, data):
@@ -26,8 +27,11 @@ class Publisher(processor.EventProcessor):
             old_trace = sys.gettrace()
             sys.settrace(None)
             msg = [
-                msg_type,
-                jsonutil.dumps(data),
+                m.encode('utf-8')
+                for m in [
+                        msg_type,
+                        jsonutil.dumps(data),
+                ]
             ]
             LOG.debug('SENDING: %r', msg)
             self.pub_socket.send_multipart(msg)

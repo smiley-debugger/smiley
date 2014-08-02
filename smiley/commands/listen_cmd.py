@@ -32,6 +32,7 @@ class ListeningCommand(command.Command):
 
     def take_action(self, parsed_args):
         self._parsed_args = parsed_args
+        self.log.info('Listening on %s', parsed_args.socket)
         l = listener.Listener(parsed_args.socket)
         l.poll_forever(self._process_message)
         return

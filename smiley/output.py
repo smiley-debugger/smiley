@@ -6,6 +6,7 @@ import os
 import pprint
 
 import prettytable
+import six
 
 from smiley import processor
 
@@ -20,7 +21,7 @@ def format_dictionary(d):
     x.align['Value'] = 'l'
     for name, value in sorted(d.items()):
         formatted_value = pprint.pformat(value, width=60)
-        pairs = itertools.izip(
+        pairs = six.moves.zip(
             itertools.chain([name], itertools.repeat('')),
             formatted_value.splitlines())
         for name, value in pairs:
@@ -69,7 +70,7 @@ class OutputFormatter(processor.EventProcessor):
         if message:
             self.log.info('ERROR in app: %s', message)
 
-    def trace(self, run_id, thread_id, event,
+    def trace(self, run_id, thread_id, call_id, event,
               func_name, line_no, filename,
               trace_arg, local_vars,
               timestamp):

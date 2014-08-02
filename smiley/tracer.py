@@ -16,6 +16,7 @@ import uuid
 import coverage
 from coverage.execfile import run_python_file
 from coverage.misc import ExceptionDuringRun
+import six
 
 import smiley
 from smiley.stats import stats_to_blob
@@ -257,7 +258,7 @@ class Tracer(object):
                 self.publisher.end_run(
                     self.run_id,
                     end_time=time.time(),
-                    message=unicode(orig_err),
+                    message=six.text_type(orig_err),
                     traceback=traceback,
                     stats=context.get_stats_data(),
                 )

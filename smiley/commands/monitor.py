@@ -40,22 +40,25 @@ class Monitor(listen_cmd.ListeningCommand):
 
         elif msg_type == 'end_run':
             self.out.end_run(
-                msg_payload['run_id'],
-                msg_payload['timestamp'],
-                msg_payload['message'],
-                msg_payload['traceback'],
+                run_id=msg_payload['run_id'],
+                end_time=msg_payload['timestamp'],
+                message=msg_payload['message'],
+                traceback=msg_payload['traceback'],
+                stats=msg_payload['stats'],
             )
             if self._parsed_args.exit:
                 raise SystemExit()
 
         else:
             self.out.trace(
-                msg_payload['run_id'],
-                msg_type,
-                msg_payload['func_name'],
-                msg_payload['line_no'],
-                msg_payload['filename'],
-                msg_payload['arg'],
-                msg_payload['local_vars'],
-                msg_payload['timestamp'],
+                run_id=msg_payload['run_id'],
+                thread_id=msg_payload['thread_id'],
+                call_id=msg_payload['call_id'],
+                event=msg_type,
+                func_name=msg_payload['func_name'],
+                line_no=msg_payload['line_no'],
+                filename=msg_payload['filename'],
+                trace_arg=msg_payload['arg'],
+                local_vars=msg_payload['local_vars'],
+                timestamp=msg_payload['timestamp'],
             )

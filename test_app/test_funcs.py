@@ -5,7 +5,7 @@ import sys
 
 def gen(m):
     "docstring"
-    for i in xrange(m):
+    for i in range(m):
         # inside the for loop
         yield i
 

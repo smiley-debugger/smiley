@@ -1,6 +1,7 @@
 import json
 import logging
 
+import six
 import zmq
 
 LOG = logging.getLogger(__name__)
@@ -12,7 +13,7 @@ class Listener(object):
         self.context = zmq.Context()
         self.sub_socket = self.context.socket(zmq.PULL)
         self.sub_socket.connect(endpoint)
-        self.sub_socket.identity = 'subscriber'
+        self.sub_socket.identity = six.b('subscriber')
         self.poller = zmq.Poller()
         self.poller.register(self.sub_socket, zmq.POLLIN)
 
@@ -23,8 +24,8 @@ class Listener(object):
             # Receiving data on the subscriber socket
             msg_type, msg_data = self.sub_socket.recv_multipart()
             yield [
-                msg_type,
-                json.loads(msg_data),
+                msg_type.decode('utf-8'),
+                json.loads(msg_data.decode('utf-8')),
             ]
 
     def poll_forever(self, callback, timeout=1000):
