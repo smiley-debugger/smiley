@@ -321,6 +321,13 @@ class QueryTest(testtools.TestCase):
         )
         self.assertIsNone(run.stats)
 
+    def test_get_run_missing(self):
+        self.assertRaises(
+            db.NoSuchRun,
+            self.db.get_run,
+            'no-run-with-this-id',
+        )
+
     def test_get_trace(self):
         trace = list(self.db.get_trace('12345'))
         self.assertEqual(len(trace), 2)

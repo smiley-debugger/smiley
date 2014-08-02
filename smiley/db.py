@@ -16,6 +16,14 @@ from smiley import stats as stats_utils
 LOG = logging.getLogger(__name__)
 
 
+class NoSuchRun(Exception):
+    def __init__(self, run_id):
+        super(NoSuchRun, self).__init__(
+            'No run with id %r' % run_id,
+            run_id,
+        )
+
+
 Run = collections.namedtuple(
     'Run',
     'id cwd description start_time end_time error_message stats traceback',
@@ -191,7 +199,10 @@ class DB(processor.EventProcessor):
                 u"SELECT * FROM run WHERE id = :run_id",
                 {'run_id': run_id},
             )
-            return _make_run(c.fetchone())
+            row = c.fetchone()
+            if row is None:
+                raise NoSuchRun(run_id)
+            return _make_run(row)
 
     def get_thread_details(self, run_id):
         "Return the names of the threads used in the run."

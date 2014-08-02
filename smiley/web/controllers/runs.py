@@ -1,9 +1,11 @@
 import functools
 import logging
 
-from pecan import expose, request
+from pecan import abort, expose, request
 from pecan.rest import RestController
+import six
 
+from smiley import db
 from smiley.presentation import pagination
 from smiley.presentation import syntax
 from smiley.presentation import trace
@@ -83,7 +85,11 @@ class RunController(RestController):
             return syntax_line_cache.getlines(filename, start, end,
                                               include_comments=True)
 
-        context = run_context.get_context(request.db, run_id, thread_id)
+        try:
+            context = run_context.get_context(request.db, run_id, thread_id)
+        except db.NoSuchRun as e:
+            # No such run.
+            abort(404, six.text_type(e))
         context.update({
             'trace': trace_data[start:end],
             'getlines': getlines,
