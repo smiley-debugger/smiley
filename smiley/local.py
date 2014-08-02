@@ -85,6 +85,7 @@ class LocalPublisher(processor.EventProcessor):
         # Should we be decoding the text file here?
         with open(filename, 'rb') as f:
             body = f.read()
+        return body
 
     def trace(self, run_id, thread_id, call_id, event,
               func_name, line_no, filename,
