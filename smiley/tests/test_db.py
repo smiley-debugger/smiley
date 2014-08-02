@@ -1,11 +1,37 @@
+# -*- encoding: utf-8 -*-
+
 import datetime
 import fixtures
 import json
+import profile
+import pstats
+import tempfile
 import testtools
 
 import six
 
 from smiley import db
+from smiley import stats
+
+
+class InitializationTest(testtools.TestCase):
+
+    def test_initialize_first_time(self):
+        with tempfile.NamedTemporaryFile() as f:
+            conn = db.DB._open_db(f.name)
+            cursor = conn.cursor()
+            cursor.execute(u'select * from run')
+            results = cursor.fetchall()
+            self.assertEqual(0, len(results))
+
+    def test_initialize_second_time(self):
+        with tempfile.NamedTemporaryFile() as f:
+            db.DB._open_db(f.name)
+            conn2 = db.DB._open_db(f.name)
+            cursor = conn2.cursor()
+            cursor.execute(u'select * from run')
+            results = cursor.fetchall()
+            self.assertEqual(0, len(results))
 
 
 class TransactionTest(testtools.TestCase):
@@ -86,6 +112,23 @@ class DBTest(testtools.TestCase):
         self.assertEqual(row['end_time'], None)
         self.assertEqual(row['error_message'], None)
         self.assertEqual(row['traceback'], None)
+
+    def test_start_run_repeat_run_id(self):
+        self.db.start_run(
+            '12345',
+            '/no/such/dir',
+            'command line would go here',
+            1370436103.65,
+        )
+        try:
+            self.db.start_run(
+                '12345',
+                '/no/such/dir',
+                'command line would go here',
+                1370436103.65,
+            )
+        except ValueError as e:
+            self.assertIn('12345', unicode(e))
 
     def test_end_run_clean(self):
         self.db.start_run(
@@ -276,12 +319,71 @@ class QueryTest(testtools.TestCase):
             run.description,
             ['command', 'line', 'would', 'go', 'here']
         )
+        self.assertIsNone(run.stats)
 
     def test_get_trace(self):
         trace = list(self.db.get_trace('12345'))
         self.assertEqual(len(trace), 2)
         line_nos = [r.line_no for r in trace]
         self.assertEqual(line_nos, [99, 100])
+
+
+class QueryWithStatsTest(testtools.TestCase):
+
+    def setUp(self):
+        super(QueryWithStatsTest, self).setUp()
+        self.useFixture(fixtures.FakeLogger())
+        self.db = db.DB(':memory:')
+        self.db.start_run(
+            '12345',
+            '/no/such/dir',
+            ['command', 'line', 'would', 'go', 'here'],
+            1370436103.65,
+        )
+        self.local_values = {'name': ['value', 'pairs']}
+        self.trace_arg = [{'complex': 'value'}]
+        self.db.trace(
+            run_id='12345',
+            thread_id='t1',
+            call_id='abcd',
+            event='test',
+            func_name='test_trace',
+            line_no=99,
+            filename='test_db.py',
+            trace_arg=self.trace_arg,
+            local_vars=self.local_values,
+            timestamp=1370436104.65,
+        )
+        self.db.trace(
+            run_id='12345',
+            thread_id='t1',
+            call_id='abcd',
+            event='test',
+            func_name='test_trace',
+            line_no=100,
+            filename='test_db.py',
+            trace_arg=self.trace_arg,
+            local_vars=self.local_values,
+            timestamp=1370436104.65,
+        )
+        self.db.start_run(
+            '6789',
+            '/no/such/dir',
+            ['command', 'line', 'would', 'go', 'here'],
+            1370436104.65,
+        )
+        stats_data = stats.stats_to_blob(pstats.Stats(profile.Profile()))
+        self.db.end_run(
+            '6789',
+            1370436105.65,
+            'error message',
+            None,
+            stats=stats_data,
+        )
+
+    def test_get_run(self):
+        run = self.db.get_run('6789')
+        self.assertIsNotNone(run.stats)
 
 
 class ThreadQueryTest(testtools.TestCase):
@@ -422,6 +524,34 @@ class FileCacheTest(testtools.TestCase):
         self.assertEqual(len(rows), 1)
         row = rows[0]
         self.assertEqual(row['body'], 'this would be the body')
+        self.assertEqual(row['name'], 'test-file.txt')
+
+    def test_add_file_unicode_name(self):
+        self.db.cache_file_for_run(
+            '12345',
+            u'téßt-file.txt',
+            'this would be the body',
+        )
+        c = self.db.conn.cursor()
+        c.execute('select * from file')
+        rows = list(c.fetchall())
+        self.assertEqual(len(rows), 1)
+        row = rows[0]
+        self.assertEqual(row['body'], 'this would be the body')
+        self.assertEqual(row['name'], u'téßt-file.txt')
+
+    def test_add_file_body(self):
+        self.db.cache_file_for_run(
+            '12345',
+            'test-file.txt',
+            u'thîs would be thé bødy',
+        )
+        c = self.db.conn.cursor()
+        c.execute('select * from file')
+        rows = list(c.fetchall())
+        self.assertEqual(len(rows), 1)
+        row = rows[0]
+        self.assertEqual(row['body'], u'thîs would be thé bødy')
         self.assertEqual(row['name'], 'test-file.txt')
 
     def test_add_file_twice_same(self):

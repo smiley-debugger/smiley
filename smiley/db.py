@@ -14,6 +14,7 @@ import six
 
 from smiley import jsonutil
 from smiley import processor
+from smiley import stats as stats_utils
 
 LOG = logging.getLogger(__name__)
 
@@ -25,15 +26,9 @@ Run = collections.namedtuple(
 
 
 def _make_run(row):
-    # HACK: It really is too bad that pstats can't load data from
-    # a string.
+    stats = None
     if row['stats']:
-        with tempfile.NamedTemporaryFile(mode='w') as f:
-            f.write(base64.b64decode(row['stats']))
-            f.flush()
-            stats = pstats.Stats(f.name)
-    else:
-        stats = None
+        stats = stats_utils.blob_to_stats(row['stats'])
     return Run(
         row['id'],
         row['cwd'],
