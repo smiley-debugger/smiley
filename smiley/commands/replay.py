@@ -36,27 +36,28 @@ class Replay(command.Command):
 
         run_details = self.db.get_run(parsed_args.run_id)
         self.out.start_run(
-            run_details.id,
-            run_details.cwd,
-            run_details.description,
-            run_details.start_time,
+            run_id=run_details.id,
+            cwd=run_details.cwd,
+            description=run_details.description,
+            start_time=run_details.start_time,
         )
         for t in self.db.get_trace(parsed_args.run_id):
             self.out.trace(
-                t.run_id,
-                t.thread_id,
-                t.event,
-                t.func_name,
-                t.line_no,
-                t.filename,
-                t.trace_arg,
-                t.local_vars,
-                t.timestamp,
+                run_id=t.run_id,
+                thread_id=t.thread_id,
+                call_id=t.call_id,
+                event=t.event,
+                func_name=t.func_name,
+                line_no=t.line_no,
+                filename=t.filename,
+                trace_arg=t.trace_arg,
+                local_vars=t.local_vars,
+                timestamp=t.timestamp,
             )
         self.out.end_run(
-            run_details.id,
-            run_details.end_time,
-            run_details.error_message,
-            None,  # run_details.traceback,
-            None,  # stats
+            run_id=run_details.id,
+            end_time=run_details.end_time,
+            message=run_details.error_message,
+            traceback=None,
+            stats=None,
         )
