@@ -21,7 +21,7 @@ class JSONTest(testtools.TestCase):
             import sys
             expected = traceback.extract_tb(sys.exc_info()[-1])
             actual = jsonutil._json_special_types(sys.exc_info()[-1])
-        self.assertEqual(actual, expected)
+        self.assertEqual(expected, actual)
 
     def test_exception(self):
         err = RuntimeError('here')
@@ -38,7 +38,7 @@ class JSONTest(testtools.TestCase):
                 '__module__': 'exceptions',
                 'args': ('here',),
             }
-        self.assertEqual(actual, expected)
+        self.assertEqual(expected, actual)
 
     def test_exception_with_complex_object(self):
         err = RuntimeError(self)
@@ -55,7 +55,7 @@ class JSONTest(testtools.TestCase):
                 '__module__': 'exceptions',
                 'args': (self,),
             }
-        self.assertEqual(actual, expected)
+        self.assertEqual(expected, actual)
 
     def test_arbitrary_object(self):
         class Foo(object):
@@ -69,7 +69,7 @@ class JSONTest(testtools.TestCase):
             'b': 'B',
         }
         actual = jsonutil._json_special_types(Foo())
-        self.assertEqual(actual, expected)
+        self.assertEqual(expected, actual)
 
     def test_arbitrary_object_old_style(self):
         class Foo:
@@ -83,7 +83,7 @@ class JSONTest(testtools.TestCase):
             'b': 'B',
         }
         actual = jsonutil._json_special_types(Foo())
-        self.assertEqual(actual, expected)
+        self.assertEqual(expected, actual)
 
     def test_type(self):
         if six.PY2:
@@ -91,4 +91,4 @@ class JSONTest(testtools.TestCase):
         else:
             expected = "<class 'int'>"
         actual = jsonutil._json_special_types(int)
-        self.assertEqual(actual, expected)
+        self.assertEqual(expected, actual)
