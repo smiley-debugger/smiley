@@ -41,7 +41,10 @@ class LocalPublisher(processor.EventProcessor):
             if next_data is None:
                 q.task_done()
                 break
-            self._dispatch_one(the_db, next_data)
+            try:
+                self._dispatch_one(the_db, next_data)
+            except:
+                LOG.exception('error processing %r', next_data)
             q.task_done()
         return
 
