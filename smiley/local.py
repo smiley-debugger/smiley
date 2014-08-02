@@ -1,6 +1,7 @@
 import codecs
 import logging
 import os
+import six
 from six.moves import queue
 import threading
 
@@ -88,8 +89,11 @@ class LocalPublisher(processor.EventProcessor):
     def _get_file_contents(self, filename):
         # Should we be decoding the text file here?
         # FIXME: Guess the encoding?
-        with codecs.open(filename, 'r', encoding='utf-8') as f:
-            body = f.read()
+        try:
+            with codecs.open(filename, 'r', encoding='utf-8') as f:
+                body = f.read()
+        except IOError:
+            body = six.u('')
         return body
 
     def trace(self, run_id, thread_id, call_id, event,
