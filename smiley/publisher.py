@@ -29,8 +29,8 @@ class Publisher(processor.EventProcessor):
             msg = [
                 m.encode('utf-8')
                 for m in [
-                        msg_type,
-                        jsonutil.dumps(data),
+                    msg_type,
+                    jsonutil.dumps(data),
                 ]
             ]
             LOG.debug('SENDING: %r', msg)

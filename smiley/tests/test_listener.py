@@ -2,7 +2,6 @@ import json
 
 import fixtures
 import mock
-import six
 import testtools
 import zmq
 
