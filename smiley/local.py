@@ -1,3 +1,4 @@
+import codecs
 import logging
 import os
 from six.moves import queue
@@ -86,7 +87,8 @@ class LocalPublisher(processor.EventProcessor):
 
     def _get_file_contents(self, filename):
         # Should we be decoding the text file here?
-        with open(filename, 'rb') as f:
+        # FIXME: Guess the encoding?
+        with codecs.open(filename, 'r', encoding='utf-8') as f:
             body = f.read()
         return body
 
