@@ -1,4 +1,3 @@
-import base64
 import collections
 import contextlib
 import datetime
@@ -6,9 +5,7 @@ import hashlib
 import json
 import logging
 import pkgutil
-import pstats
 import sqlite3
-import tempfile
 
 import six
 
@@ -172,7 +169,7 @@ class DB(processor.EventProcessor):
                  'end_time': end_time,
                  'message': message,
                  'traceback': jsonutil.dumps(traceback),
-                 'stats': base64.b64encode(stats) if stats else None},
+                 'stats': stats or None}
             )
 
     def get_runs(self, only_errors=False, sort_order='ASC'):

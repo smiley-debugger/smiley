@@ -3,19 +3,20 @@ import marshal
 import pstats
 import tempfile
 
+import six
+
 
 def stats_to_blob(stats):
-    with tempfile.TemporaryFile(mode='r+') as f:
-        marshal.dump(stats.stats, f)
-        f.flush()
-        f.seek(0)
-        return f.read()
+    marshalled = marshal.dumps(stats.stats)
+    encoded = base64.b64encode(marshalled)
+    return six.text_type(encoded, encoding='utf-8')
 
 
 def blob_to_stats(data):
     # HACK: It really is too bad that pstats can't load data from a
     # string or StringIO.
-    with tempfile.NamedTemporaryFile(mode='w') as f:
-        f.write(base64.b64decode(data))
+    decoded = base64.b64decode(data)
+    with tempfile.NamedTemporaryFile(mode='wb') as f:
+        f.write(decoded)
         f.flush()
         return pstats.Stats(f.name)

@@ -86,6 +86,9 @@ class JSONTest(testtools.TestCase):
         self.assertEqual(actual, expected)
 
     def test_type(self):
-        expected = "<type 'int'>"
+        if six.PY2:
+            expected = "<type 'int'>"
+        else:
+            expected = "<class 'int'>"
         actual = jsonutil._json_special_types(int)
         self.assertEqual(actual, expected)

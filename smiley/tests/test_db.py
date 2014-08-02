@@ -128,7 +128,7 @@ class DBTest(testtools.TestCase):
                 1370436103.65,
             )
         except ValueError as e:
-            self.assertIn('12345', unicode(e))
+            self.assertIn('12345', six.text_type(e))
 
     def test_end_run_clean(self):
         self.db.start_run(
