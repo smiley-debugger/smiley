@@ -168,6 +168,11 @@ class Tracer(object):
             # LOG.debug('ignoring builtin %s', filename)
             return True
         filename = os.path.realpath(filename)
+        # There are way, way, too many circular references produced by
+        # pkg_resources. Assume no one wants to dig into that module
+        # anyway, and just ignore it.
+        if 'pkg_resources' in filename:
+            return True
         for d in self._include_packages:
             # LOG.debug('checking include package %s', d)
             if filename.startswith(d):
