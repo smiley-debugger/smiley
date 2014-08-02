@@ -18,6 +18,11 @@ class LocalPublisher(processor.EventProcessor):
             target=self._process_data,
             args=(database, self._q,)
         )
+        # We want to kill the thread cleanly, but if something goes
+        # wrong trying to start the program we are tracing we don't
+        # want smiley to hang, so set the background thread to daemon
+        # mode.
+        self._db_thread.setDaemon(True)
         self._db_thread.start()
 
     def _process_data(self, database, q):
