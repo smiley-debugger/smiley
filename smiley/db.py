@@ -136,6 +136,7 @@ class DB(processor.EventProcessor):
 
     def start_run(self, run_id, cwd, description, start_time):
         "Record the beginning of a run."
+        # LOG.debug('start_run(%s)', run_id)
         with transaction(self.conn) as c:
             try:
                 c.execute(
@@ -154,6 +155,7 @@ class DB(processor.EventProcessor):
 
     def end_run(self, run_id, end_time, message, traceback, stats):
         "Record the end of a run."
+        # LOG.debug('end_run(%s)', run_id)
         with transaction(self.conn) as c:
             c.execute(
                 u"""

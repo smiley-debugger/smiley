@@ -30,7 +30,8 @@ class LocalPublisher(processor.EventProcessor):
         while True:
             next_data = q.get()
             if next_data is None:
-                return
+                q.task_done()
+                break
             op, data = next_data
             if op == 'start':
                 the_db.start_run(*data)
@@ -40,6 +41,10 @@ class LocalPublisher(processor.EventProcessor):
                 the_db.trace(*data)
             elif op == 'file':
                 the_db.cache_file_for_run(*data)
+            else:
+                LOG.warning('unrecognized data: %r', next_data)
+            q.task_done()
+        return
 
     def _reset_cache(self):
         self._cached_files = set()
@@ -58,6 +63,7 @@ class LocalPublisher(processor.EventProcessor):
         """
         self._q.put(('end', (run_id, end_time, message, traceback, stats)))
         self._q.put(None)
+        self._q.join()
 
     def trace(self, run_id, thread_id, call_id, event,
               func_name, line_no, filename,
