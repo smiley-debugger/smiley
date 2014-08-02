@@ -48,7 +48,7 @@ class Server(command.Command):
 
         # Add beaker session middleware so we can track where the user
         # is and navigate back to the same place as they change tabs.
-        if six.PY2:
+        if not six.PY3:
             app = SessionMiddleware(app, config_data['beaker'])
 
         host = config_data['server']['host']
