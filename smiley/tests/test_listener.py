@@ -2,6 +2,7 @@ import json
 
 import fixtures
 import mock
+import six
 import testtools
 import zmq
 
@@ -40,8 +41,8 @@ class ListenerTest(testtools.TestCase):
             'key2': ['v1', 1],
         }
         socket.return_value.recv_multipart.return_value = (
-            'message type name',
-            json.dumps(msg),
+            u'message type name'.encode('utf-8'),
+            json.dumps(msg).encode('utf-8'),
         )
         l = listener.Listener('endpoint')
         val = next(l.poll_once())

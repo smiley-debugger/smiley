@@ -33,5 +33,6 @@ class PublisherTest(testtools.TestCase):
         p._send('message type name', msg)
         s = socket.return_value
         s.send_multipart.assert_called_with(
-            ['message type name', json.dumps(msg)]
+            [u'message type name'.encode('utf-8'),
+             json.dumps(msg).encode('utf-8')]
         )
