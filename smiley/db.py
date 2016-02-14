@@ -280,6 +280,20 @@ class DB(processor.EventProcessor):
             return (_make_trace(t)
                     for t in c.fetchall())
 
+    def delete_run(self, run_id):
+        """Remove a run and all of its trace events from the database"""
+        #Ensure that the run exists. This will raise NoSuchRun if it doesn't.
+        run = self.get_run(run_id)
+        with transaction(self.conn) as c:
+            c.execute(
+                u""" DELETE FROM trace WHERE run_id = :run_id""",
+                {"run_id": run_id}
+            )
+            c.execute(
+                u"""DELETE FROM run WHERE id = :run_id""",
+                {"run_id": run_id}
+            )
+
     def cache_file_for_run(self, run_id, filename, body):
         signature_maker = hashlib.sha1()
         if isinstance(filename, six.text_type):
