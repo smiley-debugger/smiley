@@ -10,6 +10,7 @@
     <table class="table table-striped">
       <thead>
         <tr>
+          <th title="Delete">X</th>
           <th>Id</th>
           <th>Description</th>
           <th>Start Time</th>
@@ -24,6 +25,7 @@
 % else:
         <tr>
 % endif
+          <td><a href="/runs/delete?run_id=${run.id}" title="Delete">X</a></td>
           <td><a href="/runs/${run.id}">${run.id}</a></td>
           <td>${run.description}</td>
           <td>${run.start_time}</td>
@@ -34,7 +36,7 @@
           <td></td>
 % endif
         </tr>
-% endfor        
+% endfor
       </tbody>
     </table>
 
