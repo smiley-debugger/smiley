@@ -5,6 +5,7 @@ from cliff import command
 
 from smiley import db
 
+
 class Delete(command.Command):
     """Delete a run from the database
 
@@ -30,4 +31,5 @@ class Delete(command.Command):
             db_.delete_run(parsed_args.run_id)
             print(u"Deleted run {}".format(parsed_args.run_id))
         except db.NoSuchRun:
-            print(u"No run found with id '{}' delete failed".format(parsed_args.run_id))
+            print(u"No run found with id '{}' delete failed".format(
+                parsed_args.run_id))

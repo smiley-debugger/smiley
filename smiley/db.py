@@ -282,8 +282,8 @@ class DB(processor.EventProcessor):
 
     def delete_run(self, run_id):
         """Remove a run and all of its trace events from the database"""
-        #Ensure that the run exists. This will raise NoSuchRun if it doesn't.
-        run = self.get_run(run_id)
+        # Ensure that the run exists. This will raise NoSuchRun if it doesn't.
+        self.get_run(run_id)
         with transaction(self.conn) as c:
             c.execute(
                 u""" DELETE FROM trace WHERE run_id = :run_id""",

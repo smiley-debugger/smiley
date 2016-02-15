@@ -4,6 +4,7 @@ from pecan import expose, redirect, request
 
 LOG = logging.getLogger(__name__)
 
+
 class DeleteController(object):
 
     @expose(generic=True)

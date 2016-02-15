@@ -1,7 +1,7 @@
 import functools
 import logging
 
-from pecan import abort, expose, redirect, request
+from pecan import abort, expose, request
 from pecan.rest import RestController
 import six
 
