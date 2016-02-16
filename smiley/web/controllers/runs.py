@@ -10,6 +10,7 @@ from smiley.presentation import pagination
 from smiley.presentation import syntax
 from smiley.presentation import trace
 from smiley.web import nav
+from smiley.web.controllers import delete
 from smiley.web.controllers import files
 from smiley.web.controllers import stats
 from smiley.web.controllers import run_context
@@ -21,6 +22,7 @@ LOG = logging.getLogger(__name__)
 
 class RunController(RestController):
 
+    delete = delete.DeleteController()
     files = files.FileController()
     stats = stats.StatsController()
     threads = thread_controller.ThreadController()
