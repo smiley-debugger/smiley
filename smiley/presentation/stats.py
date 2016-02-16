@@ -11,9 +11,9 @@ def format_data(run_id, stats, db):
         yield {
             'ncalls': '%s/%s' % (nc, cc) if nc != cc else str(nc),
             'tottime': tt,
-            'percall_nc': (float(tt)/nc) if nc else '',
+            'percall_nc': (float(tt) / nc) if nc else '',
             'cumtime': ct,
-            'percall_cc': (float(ct)/cc) if cc else '',
+            'percall_cc': (float(ct) / cc) if cc else '',
             'filename': func[0],
             'file_url': db.get_file_signature(run_id, func[0]),
             'lineno': func[1],

@@ -1,6 +1,6 @@
-testrepository
-testscenarios
-testtools
-python-subunit
-mock
-discover
+testrepository>=0.0.18
+testscenarios>=0.4.0
+testtools>=0.9.35
+python-subunit>=0.0.18
+mock>=1.0.1
+discover>=0.4.0

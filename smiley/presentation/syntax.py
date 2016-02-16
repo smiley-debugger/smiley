@@ -49,7 +49,7 @@ class StyledLineCache(object):
         # LOG.debug('getline(%s, %s)', filename, line_no)
         self._init_file(filename)
         try:
-            return self._files[filename][line_no-1]
+            return self._files[filename][line_no - 1]
         except IndexError:
             # Line number is out of range
             return ''
@@ -65,4 +65,4 @@ class StyledLineCache(object):
                 filename,
                 start,
             )
-        return '\n'.join(self._files[filename][start-1:end])
+        return '\n'.join(self._files[filename][start - 1:end])

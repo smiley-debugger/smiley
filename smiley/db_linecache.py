@@ -18,7 +18,7 @@ class DBLineCache(object):
     def getline(self, filename, line_no):
         self._init_file(filename)
         try:
-            return self._files[filename][line_no-1]
+            return self._files[filename][line_no - 1]
         except IndexError:
             # Line number is out of range
             return ''
