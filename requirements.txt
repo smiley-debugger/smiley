@@ -1,8 +1,8 @@
-cliff
-pyzmq
-coverage
-pecan
-pygments
-gprof2dot
-six
-beaker
+cliff>=1.16.0
+pyzmq>=14.3.1
+coverage>=3.7.1
+pecan>=0.6.1
+pygments>=1.6.0
+gprof2dot>=1.0
+six>=1.7.3
+Beaker>=1.6.4

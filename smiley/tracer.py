@@ -149,12 +149,12 @@ class Tracer(object):
             for n, v in frame.f_locals.items()
             # Ignore any modules, methods, or functions that have made
             # their way into the "locals" namespace for this frame.
-            if (not inspect.ismodule(v)
-                and not inspect.isfunction(v)
-                and not inspect.ismethod(v)
-                and getattr(getattr(v, '__class__', 'UNKNONWN_CLASS'),
-                            '__module__', 'UNKNOWN_MODULE') != '__future__'
-                and (n[:2] != '__' and n[-2:] != '__'))
+            if (not inspect.ismodule(v) and
+                not inspect.isfunction(v) and
+                not inspect.ismethod(v) and
+                getattr(getattr(v, '__class__', 'UNKNONWN_CLASS'),
+                        '__module__', 'UNKNOWN_MODULE') != '__future__' and
+                (n[:2] != '__' and n[-2:] != '__'))
         }
 
     def _should_ignore_file(self, filename):

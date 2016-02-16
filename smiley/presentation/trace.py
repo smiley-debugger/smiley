@@ -24,14 +24,10 @@ def collapse_trace(trace_iter):
                     vars_have_changed = True
                     break
         do_yield = (
-            accumulate  # we have something to yield
-            and
-            (vars_have_changed
-             or
-             accumulate.event != 'line'  # that something can't be collapsed
-             or
-             t.event != 'line'  # the next event can't be combined with it
-             or
+            accumulate and  # we have something to yield
+            (vars_have_changed or
+             accumulate.event != 'line' or  # that something can't be collapsed
+             t.event != 'line' or  # the next event can't be combined with it
              t.event != accumulate.event)
         )
         if do_yield:
