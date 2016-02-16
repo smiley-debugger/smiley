@@ -1,4 +1,3 @@
-from __future__ import print_function
 import logging
 
 from cliff import command
@@ -29,7 +28,7 @@ class Delete(command.Command):
         db_ = db.DB(parsed_args.database)
         try:
             db_.delete_run(parsed_args.run_id)
-            print(u"Deleted run {}".format(parsed_args.run_id))
+            self.log.info(u"Deleted run {}".format(parsed_args.run_id))
         except db.NoSuchRun:
-            print(u"No run found with id '{}' delete failed".format(
+            self.log.warn(u"No run found with id '{}' delete failed".format(
                 parsed_args.run_id))
