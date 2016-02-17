@@ -15,7 +15,8 @@ The server listens on ``http://127.0.0.1:8080`` by default. Visiting
 that page in a browser causes the server to return a list of the runs
 found in the database in reverse chronological order. For each run the
 list shows its id, "description", start and end times, and any final
-error message.
+error message. Clicking the "X" link in the far left column will
+permanently delete that run from the database.
 
 .. image:: screenshots/runs.png
    :width: 1235
