@@ -6,6 +6,7 @@ import types
 import xml.dom.minidom
 
 from cliff import commandmanager
+from six import string_types
 
 LOG = logging.getLogger(__name__)
 
@@ -38,6 +39,13 @@ def _json_special_types(obj):
     return data
 
 
+def _stringify(data):
+    """Convert data to a string if it's not already one"""
+    # It's not good enough to just call str(k):
+    # In python2 if data is  a `unicode` with non-ascii chars, this will fail.
+    return data if isinstance(data, string_types) else str(data)
+
+
 def _scrub_item(v):
     """Look for a few types that cause circular references.
     """
@@ -63,7 +71,7 @@ def _scrub_item(v):
 
 
 def _scrub_dict(data):
-    return {k: _scrub_item(v) for k, v in data.items()}
+    return {_stringify(k): _scrub_item(v) for k, v in data.items()}
 
 
 def _scrub_list(data):
@@ -89,5 +97,6 @@ def dumps(data):
             return json.dumps([repr(v) for v in data])
         elif isinstance(data, dict):
             # LOG.debug('trying with repr')
-            return json.dumps({k: repr(v) for k, v in data.items()})
+            return json.dumps(
+                {_stringify(k): repr(v) for k, v in data.items()})
         raise
