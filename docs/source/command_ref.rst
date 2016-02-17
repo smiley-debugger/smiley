@@ -35,6 +35,13 @@ list
 
 Show the runs previously recorded in the database.
 
+.. _command-delete:
+
+delete
+======
+
+Delete runs from the database.
+
 .. _command-replay:
 
 replay

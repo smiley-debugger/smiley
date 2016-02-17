@@ -5,6 +5,8 @@
 dev
 ===
 
+- Add :ref:`command-delete` to delete runs.
+- Add delete link to the web view's runs page.
 - Add :ref:`command-report` to produce static HTML output for a run.
 - Fix a problem with the "ignore" path management under virtualenv.
 
