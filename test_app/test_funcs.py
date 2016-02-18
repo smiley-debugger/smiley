@@ -50,6 +50,13 @@ def large_data_structure():
     }
     big_data['key2'] = 'key'
 
+def run_many_functions(branch_factor, depth):
+    """A function that takes a long time to run (O(branch_factor^depth))
+    
+    Useful for testing performance"""
+    if depth > 1:
+        for _ in range(branch_factor):
+            run_many_functions(branch_factor, depth - 1)
 
 def a():
     print('args:', sys.argv)

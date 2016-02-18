@@ -7,6 +7,7 @@ import test_funcs
 
 if __name__ == '__main__':
     print('Running', __file__)
+    print("test2")
     if '-t' in sys.argv:
         threads = []
         for i in range(3):
@@ -17,6 +18,9 @@ if __name__ == '__main__':
         for t in threads:
             print('Waiting for', t.name)
             t.join()
+    elif '-m' in sys.argv:
+        print("test....")
+        test_funcs.run_many_functions(10,4)
     else:
         test_funcs.a()
     if '-e' in sys.argv:
