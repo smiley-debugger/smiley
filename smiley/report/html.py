@@ -170,7 +170,7 @@ class HTMLReport(object):
 
         # The trace output is paginated, so we have multiple pages to
         # produce.
-        for i in xrange(1, last_page):
+        for i in range(1, last_page):
             page_vals = pagination.get_pagination_values(
                 i, self.per_page, len(trace_data),
             )
