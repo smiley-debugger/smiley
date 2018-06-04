@@ -57,6 +57,7 @@ class Run(command.Command):
         include_group.add_argument(
             '--no-include-site-packages',
             action='store_false',
+            dest='include_site_packages',
             help='skip modules from site-packages',
         )
         include_group.add_argument(
