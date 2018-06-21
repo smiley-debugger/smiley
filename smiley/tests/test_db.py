@@ -235,6 +235,26 @@ class TraceTest(testtools.TestCase):
         self.assertEqual(json.loads(row['local_vars']),
                          self.local_values)
 
+    def test_local_var_encoding(self):
+        """The database should properly encode dict keys as strings"""
+        self.db.trace(
+            run_id='12345',
+            thread_id='t1',
+            call_id='abcd',
+            event='test',
+            func_name='test_trace',
+            line_no=101,
+            filename='test_db.py',
+            trace_arg=self.trace_arg,
+            local_vars={"tuple_dict": {(1, 2): 3}},
+            timestamp=1370436104.65,
+        )
+        c = self.db.conn.cursor()
+        c.execute("select * from trace where trace.line_no = 101")
+        row = c.fetchone()
+        self.assertEqual(row["local_vars"],
+                         '{"tuple_dict": {"(1, 2)": 3}}')
+
     def test_trace_arg(self):
         c = self.db.conn.cursor()
         c.execute('select * from trace order by id')

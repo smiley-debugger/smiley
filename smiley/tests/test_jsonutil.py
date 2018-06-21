@@ -92,3 +92,9 @@ class JSONTest(testtools.TestCase):
             expected = "<class 'int'>"
         actual = jsonutil._json_special_types(int)
         self.assertEqual(expected, actual)
+
+    def test_dict_tuple_keys(self):
+        """Keys in dicts should be converted to strings"""
+        actual = jsonutil.dumps({(1, 2): 3})
+        expected = '{"(1, 2)": 3}'
+        self.assertEqual(expected, actual)
