@@ -17,6 +17,8 @@ if __name__ == '__main__':
         for t in threads:
             print('Waiting for', t.name)
             t.join()
+    elif '-m' in sys.argv:
+        test_funcs.run_many_functions(10, 4)
     else:
         test_funcs.a()
     if '-e' in sys.argv:
