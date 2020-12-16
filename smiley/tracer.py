@@ -253,8 +253,7 @@ class Tracer(object):
                     time.time(),
                 )
                 run_python_file(
-                    command_line[0],
-                    command_line,
+                    command_line
                 )
         except ExceptionDuringRun as err:
             # Unpack the wrapped exception
