@@ -1,6 +1,6 @@
 cliff>=1.16.0
 pyzmq>=14.3.1
-coverage>=3.7.1
+coverage>=5.3
 pecan>=0.6.1
 pygments>=1.6.0
 gprof2dot>=1.0
